@@ -1,7 +1,7 @@
 # Личный проект «Большое путешествие» [![Build status][travis-image]][travis-url]
 
 * Студент: [Георгий Ефремов](https://up.htmlacademy.ru/ecmascript/8/user/254627).
-* Наставник: [Дмитрий Марков](https://htmlacademy.ru/profile/damarkov)
+* Наставник: [Дмитрий Марков](https://htmlacademy.ru/profile/damarkov).
 
 ---
 
