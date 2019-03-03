@@ -8,11 +8,11 @@ const POINT_VARIABLES = {
     car: `🚗`,
     hotel: `🏨`,
   },
-  title: {},
-  timetable: {},
-  duration: {},
-  price: {},
-  offers: {},
+  title: Math.floor(Math.random() * 201),
+  timetable: Math.floor(Math.random() * 201),
+  duration: Math.floor(Math.random() * 201),
+  price: Math.floor(Math.random() * 201),
+  offers: [Math.floor(Math.random() * 201)],
 };
 const DB = {
   FILTERS_DATA: [
@@ -89,25 +89,48 @@ const DB = {
   ],
 };
 const MainFilter = document.querySelector(`.trip-filter`);
-const BoardTasks = document.querySelector(`.trip-day__items`);
-
+const TripDayItems = document.querySelector(`.trip-day__items`);
 function filtersRender(arr) {
   let tempBlock = ``;
   for (let i = 0; i < arr.length; i++) {
     tempBlock += filterRender(arr[i]);
   }
   MainFilter.insertAdjacentHTML(`beforeend`, tempBlock);
- // MainFilter.addEventListener(`click`, clickOnFilterHandler);
+  MainFilter.addEventListener(`click`, clickOnFilterHandler);
 }
 function tasksRender(arr) {
   let tempBlock = ``;
   for (let i = 0; i < arr.length; i++) {
     tempBlock += tripPointRender(arr[i]);
   }
-  BoardTasks.insertAdjacentHTML(`beforeend`, tempBlock);
+  TripDayItems.insertAdjacentHTML(`beforeend`, tempBlock);
 }
-window.onload = function() {
-  console.log(`1`);
+function randomPoint({icon, ...rest}) {
+  TripDayItems.innerHTML = ``;
+  let tempBlock = ``;
+  for (let i = 0; i < Math.floor(Math.random() * 20); i++) {
+    tempBlock += tripPointRender({
+      icon: icon[Object.keys(icon)[Math.floor(Math.random() * Object.keys(icon).length)]],
+      title: Math.floor(Math.random() * 201),
+      timetable: Math.floor(Math.random() * 201),
+      duration: Math.floor(Math.random() * 201),
+      price: Math.floor(Math.random() * 201),
+      offers: [Math.floor(Math.random() * 201), Math.floor(Math.random() * 201)],
+    });
+  }
+  TripDayItems.insertAdjacentHTML(`beforeend`, tempBlock);
+}
+function clickOnFilterHandler(event) {
+  let target = event.target;
+  while (target !== MainFilter) {
+    if (target.className === `trip-filter__item`) {
+      randomPoint(POINT_VARIABLES);
+      return;
+    }
+    target = target.parentNode;
+  }
+}
+window.onload = function () {
   filtersRender(DB.FILTERS_DATA);
   tasksRender(DB.POINTS_DATA);
 };
