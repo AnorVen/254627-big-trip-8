@@ -105,13 +105,13 @@ function tasksRender(arr) {
   }
   TripDayItems.insertAdjacentHTML(`beforeend`, tempBlock);
 }
-function randomPoint({icon, ...rest}) {
+function randomPoint({icon, title, ...rest}) {
   TripDayItems.innerHTML = ``;
   let tempBlock = ``;
   for (let i = 0; i < Math.floor(Math.random() * 20); i++) {
     tempBlock += tripPointRender({
       icon: icon[Object.keys(icon)[Math.floor(Math.random() * Object.keys(icon).length)]],
-      title: Math.floor(Math.random() * 201),
+      title: title,
       timetable: Math.floor(Math.random() * 201),
       duration: Math.floor(Math.random() * 201),
       price: Math.floor(Math.random() * 201),
