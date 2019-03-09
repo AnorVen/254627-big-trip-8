@@ -17,9 +17,15 @@ function timeSectionRender(timetable, duration) {
   let timeEndMinutes = new Date(timetable + duration).getMinutes();
   let durationHours = new Date(duration).getHours();
   let durationMinutes = new Date(duration).getMinutes();
-  durationMinutes.toString().length === 1 ? durationMinutes = `0${durationMinutes}` : null;
-  timeStartMinutes.toString().length === 1 ? timeStartMinutes = `0${timeStartMinutes}` : null;
-  timeEndMinutes.toString().length === 1 ? timeEndMinutes = `0${timeEndMinutes}` : null;
+  if (durationMinutes.toString().length === 1) {
+    durationMinutes = `0${durationMinutes}`;
+  }
+  if (timeStartMinutes.toString().length === 1) {
+    timeStartMinutes = `0${timeStartMinutes}`;
+  }
+  if (timeEndMinutes.toString().length === 1) {
+    timeEndMinutes = `0${timeEndMinutes}`;
+  }
   /* Даты складываются как-то коряво.. непойму почему
    console.log(new Date(Date.now() + duration).getHours());
     console.log(new Date(duration).getHours());
