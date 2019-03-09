@@ -14,7 +14,7 @@ const POINT_VARIABLES = {
       Sightseeing: `🏛️`,
       Restaurant: `🍴`
     },
-    title:new Set([`Taxi to Airport`, `Taxi to Airport`,`Drive to Chamonix`,`Check into a hotel`]),
+    title:[`Taxi to Airport`, `Taxi to Airport`,`Drive to Chamonix`,`Check into a hotel`],
     timetable: Date.now() + 1 + Math.floor(Math.random() * 7) * (Math.floor(Math.random() * 24)) * (Math.floor(Math.random() * 60)) * 60 * 1000,
     duration: new Date((Math.floor(Math.random() * 60)) * 60 * 1000),
     price: Math.floor(Math.random() * 201),
