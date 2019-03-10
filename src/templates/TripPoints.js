@@ -24,7 +24,7 @@ function timeSectionRender(timetable, duration) {
   let timeStartMinutes = new Date(timetable).getMinutes();
   let timeEndHours = new Date(timetable + duration).getHours();
   let timeEndMinutes = new Date(timetable + duration).getMinutes();
-  let durationHours = new Date(duration).getHours() + ((new Date).getTimezoneOffset() / 60);
+  let durationHours = new Date(duration).getHours() + ((new Date()).getTimezoneOffset() / 60);
   let durationMinutes = new Date(duration).getMinutes();
 
   if (durationMinutes.toString().length === 1) {
