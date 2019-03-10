@@ -1,13 +1,22 @@
 function offerRender(arr) {
-  let newArr = arr.length > 2 ? arr.slice(0, 2) : arr;
-  let offters = `<ul class="trip-point__offers">`;
-  for (let offer of newArr) {
-    offters += `<li><button class="trip-point__offer">`;
-    offters += offer;
-    offters += `</button></li>`;
+
+  if (arr.length > 2) {
+    let newItems = [];
+    for (let i = 0; i < Math.floor(Math.random() * 3); i++) {
+      let idx = Math.floor(Math.random() * arr.length);
+      newItems.push(arr[idx]);
+      arr.splice(idx, 1);
+    }
+    arr = newItems;
   }
-  offters += `</ul>`;
-  return offters;
+  let offers = `<ul class="trip-point__offers">`;
+  for (let offer of arr) {
+    offers += `<li><button class="trip-point__offer">`;
+    offers += offer;
+    offers += `</button></li>`;
+  }
+  offers += `</ul>`;
+  return offers;
 }
 
 function timeSectionRender(timetable, duration) {
@@ -15,8 +24,9 @@ function timeSectionRender(timetable, duration) {
   let timeStartMinutes = new Date(timetable).getMinutes();
   let timeEndHours = new Date(timetable + duration).getHours();
   let timeEndMinutes = new Date(timetable + duration).getMinutes();
-  let durationHours = new Date(duration).getHours();
+  let durationHours = new Date(duration).getHours() + ((new Date).getTimezoneOffset() / 60);
   let durationMinutes = new Date(duration).getMinutes();
+
   if (durationMinutes.toString().length === 1) {
     durationMinutes = `0${durationMinutes}`;
   }
@@ -26,10 +36,6 @@ function timeSectionRender(timetable, duration) {
   if (timeEndMinutes.toString().length === 1) {
     timeEndMinutes = `0${timeEndMinutes}`;
   }
-  /* Даты складываются как-то коряво.. непойму почему
-   console.log(new Date(Date.now() + duration).getHours());
-    console.log(new Date(duration).getHours());
-    console.log(new Date(Date.now()).getHours());*/
   return `<span class="trip-point__timetable">${timeStartHours}:${timeStartMinutes}&nbsp;&mdash; ${timeEndHours}:${timeEndMinutes}</span>
             <span class="trip-point__duration">${durationHours}h ${durationMinutes}m</span>`;
 }

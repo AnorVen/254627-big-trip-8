@@ -15,15 +15,8 @@ const POINT_VARIABLES = {
     Restaurant: `🍴`,
   },
   title: [`Taxi to Airport`, `Taxi to Airport`, `Drive to Chamonix`, `Check into a hotel`],
-  timetable:
-    Date.now() +
-    1 +
-    Math.floor(Math.random() * 7) *
-      Math.floor(Math.random() * 24) *
-      Math.floor(Math.random() * 60) *
-      60 *
-      1000,
-  duration: new Date(Math.floor(Math.random() * 60) * 60 * 1000),
+  timetable: Date.now() + 1 + Math.floor(Math.random() * 7 * Math.random() * 24 * Math.random() * 60 * 60 * 1000),
+  duration: Math.floor(Math.random() * 60) * 60 * 1000,
   price: Math.floor(Math.random() * 201),
   offers: [`Add luggage`, `Switch to comfort class`, `Add meal`, `Choose seats`],
   destination: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras aliquet varius magna, non porta ligula feugiat eget. Fusce tristique felis at fermentum pharetra. Aliquam id orci ut lectus varius viverra. Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante. Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum. Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui. Sed sed nisi sed augue convallis suscipit in sed felis. Aliquam erat volutpat. Nunc fermentum tortor ac porta dapibus. In rutrum ac purus sit amet tempus.`.split(`. `),
@@ -50,12 +43,10 @@ const DB = {
       icon:
         POINT_VARIABLES.icon[
           Object.keys(POINT_VARIABLES.icon)[
-            Math.floor(Math.random() * Object.keys(POINT_VARIABLES.icon).length)
-          ]
-        ],
+            Math.floor(Math.random() * Object.keys(POINT_VARIABLES.icon).length)]],
       title: POINT_VARIABLES.title[Math.floor(Math.random() * POINT_VARIABLES.title.length)],
       timetable: POINT_VARIABLES.timetable,
-      duration: Math.floor(Math.random() * 60 * 60 * 24 * 1000),
+      duration: Math.floor(Math.random() * 60 * 60 * 4 * 1000),
       price: `${Math.floor(Math.random() * 201)}`,
       offers: POINT_VARIABLES.offers,
     },
@@ -141,6 +132,7 @@ const DB = {
 };
 const MainFilter = document.querySelector(`.trip-filter`);
 const TripDayItems = document.querySelector(`.trip-day__items`);
+
 function filtersRender(arr) {
   let tempBlock = ``;
   for (let i = 0; i < arr.length; i++) {
@@ -149,6 +141,7 @@ function filtersRender(arr) {
   MainFilter.insertAdjacentHTML(`beforeend`, tempBlock);
   MainFilter.addEventListener(`click`, clickOnFilterHandler);
 }
+
 function tasksRender(arr) {
   let tempBlock = ``;
   for (let i = 0; i < arr.length; i++) {
@@ -156,6 +149,7 @@ function tasksRender(arr) {
   }
   TripDayItems.insertAdjacentHTML(`beforeend`, tempBlock);
 }
+
 function randomPoint({icon}) {
   TripDayItems.innerHTML = ``;
   let tempBlock = ``;
@@ -171,6 +165,7 @@ function randomPoint({icon}) {
   }
   TripDayItems.insertAdjacentHTML(`beforeend`, tempBlock);
 }
+
 function clickOnFilterHandler(event) {
   let target = event.target;
   while (target !== MainFilter) {
@@ -181,6 +176,7 @@ function clickOnFilterHandler(event) {
     target = target.parentNode;
   }
 }
+
 window.onload = function () {
   filtersRender(DB.FILTERS_DATA);
   tasksRender(DB.POINTS_DATA);
