@@ -56,8 +56,6 @@ export class TripPoint {
     <p  class = "trip-point__price" > &euro; &nbsp; ${this._price}</p>
   ${this._offerRender(this._offers)}
 </article>
-`);}
+ `);
+  }
 }
-
-
-

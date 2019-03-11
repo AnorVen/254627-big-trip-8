@@ -163,7 +163,7 @@ function randomPoint({icon}) {
       icon: icon[Object.keys(icon)[Math.floor(Math.random() * Object.keys(icon).length)]],
       title: POINT_VARIABLES.title[Math.floor(Math.random() * POINT_VARIABLES.title.length)],
       timestart: Date.now() + Math.round(Math.random() * 2010000),
-      duration: Math.round(Math.random() * 60*60*24*1000),
+      duration: Math.round(Math.random() * 60 * 60 * 24 * 1000),
       price: Math.floor(Math.random() * 201),
       offers: [Math.floor(Math.random() * 201), Math.floor(Math.random() * 201)],
     });
