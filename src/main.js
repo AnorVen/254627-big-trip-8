@@ -85,7 +85,8 @@ const DB = {
         ],
       title: POINT_VARIABLES.title[Math.floor(Math.random() * POINT_VARIABLES.title.length)],
       timetable: POINT_VARIABLES.timetable,
-      duration: Math.floor(Math.random() * 60 * 60 * 24 * 1000),
+// TODO  duration: Math.round(Math.random() * 60 * 60 * 24 * 1000),
+      duration: Math.round(Math.random() * 60 * 60 * 24 * 1000),
       price: `${Math.floor(Math.random() * 201)}`,
       offers: POINT_VARIABLES.offers,
     },
@@ -144,8 +145,10 @@ function filtersRender(arr) {
 
 function tasksRender(arr) {
   let tempBlock = ``;
+  let timeShift = 0;
   for (let i = 0; i < arr.length; i++) {
-    tempBlock += tripPointRender(arr[i]);
+    timeShift += arr[i].duration;
+    tempBlock += tripPointRender(arr[i], timeShift);
   }
   TripDayItems.insertAdjacentHTML(`beforeend`, tempBlock);
 }

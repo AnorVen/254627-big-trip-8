@@ -20,6 +20,7 @@ function offerRender(arr) {
 }
 
 function timeSectionRender(timetable, duration) {
+  let date = new Date();
   let timeStartHours = new Date(timetable).getHours();
   let timeStartMinutes = new Date(timetable).getMinutes();
   let timeEndHours = new Date(timetable + duration).getHours();
@@ -40,7 +41,8 @@ function timeSectionRender(timetable, duration) {
             <span class="trip-point__duration">${durationHours}h ${durationMinutes}m</span>`;
 }
 
-const tripPointRender = ({icon, title, timetable, duration, price, offers}) => {
+const tripPointRender = ({icon, title, timetable, duration, price, offers}, timeShift) => {
+// TODO  const time = (timeShift) => ();
   return `
  <article class="trip-point">
           <i class="trip-icon">${icon}</i>
