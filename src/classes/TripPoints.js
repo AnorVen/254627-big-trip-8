@@ -1,3 +1,5 @@
+import {createElement} from '../createElement';
+
 export class TripPoint {
   constructor({icon, title, timestart, duration, price, offers}, timeShift = timestart) {
     this._icon = icon;
@@ -7,6 +9,27 @@ export class TripPoint {
     this._price = price;
     this._offers = offers;
     this._timeShift = timeShift;
+
+    this._element = null;
+    this._onEdit = null;
+  }
+  bind() {
+    this._element.querySelector(`.trip-point`).addEventListener(`click`, this._onEditButtonClick.bind(this));
+  }
+
+  _onEditButtonClick() {
+    typeof this._onEdit === `function` && this._onEdit();
+  }
+
+  get template() {
+    return (`<article class = "trip-point" > 
+    <i class = "trip-icon" >${this._icon} </i>
+    <h3 class = "trip-point__title" >${this._title} </h3>
+    <p class = "trip-point__schedule" >
+      ${this._timeSectionRender(this._timeShift, this._duration)}
+    </p>
+    <p  class = "trip-point__price" > &euro; &nbsp; ${this._price}</p>
+    ${this._offerRender(this._offers)}</article>`);
   }
 
   _offerRender(arr) {
@@ -32,7 +55,6 @@ export class TripPoint {
 
 
   _timeSectionRender(timeShift, duration) {
-    // TODO  const time = (timeShift) => ();
     let timeStart = new Date(timeShift);
     let durationTemp = new Date(duration);
     let endTime = new Date(timeShift + duration);
@@ -48,14 +70,8 @@ export class TripPoint {
   }
 
   render() {
-    return (`<article class = "trip-point" > <i class = "trip-icon" >${this._icon} </i>
-    <h3 class = "trip-point__title" >${this._title} </h3>
-    <p class = "trip-point__schedule" >
-    ${this._timeSectionRender(this._timeShift, this._duration)}
-    </p>
-    <p  class = "trip-point__price" > &euro; &nbsp; ${this._price}</p>
-  ${this._offerRender(this._offers)}
-</article>
- `);
+    this._element = createElement(this.template);
+    this.bind();
+    return this._element;
   }
 }
