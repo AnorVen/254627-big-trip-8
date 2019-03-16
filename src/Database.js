@@ -23,16 +23,16 @@ export const POINT_VARIABLES = {
 export const DB = {
   FILTERS_DATA: [
     {
-      TITLE: `Everything`,
-      CHECKED: true,
+      title: `Everything`,
+      checked: true,
     },
     {
-      TITLE: `Future`,
-      CHECKED: false,
+      title: `Future`,
+      checked: false,
     },
     {
-      TITLE: `Past`,
-      CHECKED: false,
+      title: `Past`,
+      checked: false,
     },
   ],
   POINTS_DATA: [

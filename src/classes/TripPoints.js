@@ -13,23 +13,40 @@ export class TripPoint {
     this._element = null;
     this._onEdit = null;
   }
+  //  TODO this._element.querySelector(`.trip-icon`).addEventListener(...) не навешивается на .trip-point.. при варианте this._element.querySelector(`юtrip-point`).addEventListener(...) даже не рендерится
   bind() {
-    this._element.querySelector(`.trip-point`).addEventListener(`click`, this._onEditButtonClick.bind(this));
+    this._element.querySelector(`.trip-icon`).addEventListener(`click`, this._onEditButtonClick.bind(this));
+  }
+  unbind() {
+    this._element.querySelector(`.trip-icon`).removeEventListener(`click`, this._onEditButtonClick.bind(this));
   }
 
   _onEditButtonClick() {
-    typeof this._onEdit === `function` && this._onEdit();
+    if (typeof this._onEdit === `function`) {
+      this._onEdit();
+    }
+  }
+
+  set onEdit(fn) {
+    this._onEdit = fn;
+  }
+  get element() {
+    return this._element;
+  }
+  unrender() {
+    this.unbind();
+    this._element = null;
   }
 
   get template() {
-    return (`<article class = "trip-point" > 
-    <i class = "trip-icon" >${this._icon} </i>
-    <h3 class = "trip-point__title" >${this._title} </h3>
-    <p class = "trip-point__schedule" >
+    return (`<article class="trip-point"> 
+    <i class="trip-icon" >${this._icon} </i>
+    <h3 class="trip-point__title" >${this._title} </h3>
+    <p class="trip-point__schedule" >
       ${this._timeSectionRender(this._timeShift, this._duration)}
     </p>
     <p  class = "trip-point__price" > &euro; &nbsp; ${this._price}</p>
-    ${this._offerRender(this._offers)}</article>`);
+    ${this._offerRender(this._offers)}</article>`.trim());
   }
 
   _offerRender(arr) {

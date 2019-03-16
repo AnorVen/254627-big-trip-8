@@ -1,34 +1,45 @@
 import {TripPoint} from './classes/TripPoints';
+import {TripPointEdit} from './classes/TripPointsEdit';
 import {Filters} from './classes/Filters';
 import {POINT_VARIABLES, DB} from './Database';
 
 
 const MainFilter = document.querySelector(`.trip-filter`);
-const TripDayItems = document.querySelector(`.trip-day__items`);
+const TripPointsList = document.querySelector(`.trip-day__items`);
 
 function filtersRender(arr) {
-  let tempBlock = ``;
   for (let i = 0; i < arr.length; i++) {
-    let filterRender = new Filters(arr[i])
-    tempBlock += filterRender.render;
+    let filterRender = new Filters(arr[i]);
+    MainFilter.appendChild(filterRender.render());
   }
-  MainFilter.insertAdjacentHTML(`beforeend`, tempBlock);
   MainFilter.addEventListener(`click`, clickOnFilterHandler);
 }
 
 function tasksRender(arr) {
-  let tempBlock = ``;
   let timeShift = arr[0].timestart;
   for (let i = 0; i < arr.length; i++) {
     let tripPoint = new TripPoint(arr[i], timeShift);
-    tempBlock += tripPoint.render();
+    let tripPointEdit = new TripPointEdit(arr[i], timeShift);
+    TripPointsList.appendChild(tripPoint.render());
+
+    tripPoint.onEdit = () => {
+      tripPointEdit.render();
+      TripPointsList.replaceChild(tripPointEdit.element, tripPoint.element);
+      tripPoint.unrender();
+    };
+
+    tripPointEdit.onSubmit = () => {
+      tripPoint.render();
+      TripPointsList.replaceChild(tripPoint.element, tripPointEdit.element);
+      tripPointEdit.unrender();
+    };
+
     timeShift += arr[i].duration;
   }
-  TripDayItems.insertAdjacentHTML(`beforeend`, tempBlock);
 }
 
 function randomPoint({icon}) {
-  TripDayItems.innerHTML = ``;
+  TripPointsList.innerHTML = ``;
   let tempBlock = ``;
   for (let i = 0; i < Math.floor(Math.random() * 20); i++) {
     let tripPoint = new TripPoint({
@@ -41,7 +52,7 @@ function randomPoint({icon}) {
     });
     tempBlock += tripPoint.render();
   }
-  TripDayItems.insertAdjacentHTML(`beforeend`, tempBlock);
+  TripPointsList.insertAdjacentHTML(`beforeend`, tempBlock);
 }
 
 function clickOnFilterHandler(event) {
