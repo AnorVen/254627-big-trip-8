@@ -40,7 +40,6 @@ function tasksRender(arr) {
 
 function randomPoint({icon}) {
   TripPointsList.innerHTML = ``;
-  let tempBlock = ``;
   for (let i = 0; i < Math.floor(Math.random() * 20); i++) {
     let tripPoint = new TripPoint({
       icon: icon[Object.keys(icon)[Math.floor(Math.random() * Object.keys(icon).length)]],
@@ -50,9 +49,28 @@ function randomPoint({icon}) {
       price: Math.floor(Math.random() * 201),
       offers: [Math.floor(Math.random() * 201), Math.floor(Math.random() * 201)],
     });
-    tempBlock += tripPoint.render();
+    let tripPointEdit = new TripPointEdit({
+      icon: icon[Object.keys(icon)[Math.floor(Math.random() * Object.keys(icon).length)]],
+      title: POINT_VARIABLES.title[Math.floor(Math.random() * POINT_VARIABLES.title.length)],
+      timestart: Date.now() + Math.round(Math.random() * 2010000),
+      duration: Math.round(Math.random() * 60 * 60 * 24 * 1000),
+      price: Math.floor(Math.random() * 201),
+      offers: [Math.floor(Math.random() * 201), Math.floor(Math.random() * 201)],
+    });
+    tripPoint.onEdit = () => {
+      tripPointEdit.render();
+      TripPointsList.replaceChild(tripPointEdit.element, tripPoint.element);
+      tripPoint.unrender();
+    };
+
+    tripPointEdit.onSubmit = () => {
+      tripPoint.render();
+      TripPointsList.replaceChild(tripPoint.element, tripPointEdit.element);
+      tripPointEdit.unrender();
+    };
+
+    TripPointsList.appendChild(tripPoint.render());
   }
-  TripPointsList.insertAdjacentHTML(`beforeend`, tempBlock);
 }
 
 function clickOnFilterHandler(event) {
