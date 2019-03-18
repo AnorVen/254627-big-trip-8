@@ -1,66 +1,62 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Big Trip</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href="https://fonts.googleapis.com/css?family=Montserrat:500,600,700,800,900&amp;subset=cyrillic-ext" rel="stylesheet">
-  <link rel="stylesheet" type="text/css" media="screen" href="./css/normalize.css" />
-  <link rel="stylesheet" type="text/css" media="screen" href="./css/main.css" />
-</head>
-<body>
+import {createElement} from '../createElement';
 
-<header class="header">
-  <div class="content-wrap header__wrap">
-    <section class="trip">
-      <div class="trip__schedule">
-        <i class="trip-icon">⛰️</i>
-        <h1 class="trip__points">Amsterdam&nbsp;&mdash; Geneva&nbsp;&mdash;  Chamonix</h1>
-        <p class="trip__dates">Mar 17&nbsp;&mdash; 19</p>
-      </div>
-      <p class="trip__total">Total: <span class="trip__total-cost">&euro;&nbsp;1500</span></p>
-    </section>
+export class TripPointEdit {
+  constructor({icon, title, timestart, duration, price, offers}, timeShift = timestart) {
+    this._icon = icon;
+    this._title = title;
+    this._timestart = timestart;
+    this._duration = duration;
+    this._price = price;
+    this._offers = offers;
+    this._timeShift = timeShift;
+    this._element = null;
+  }
+  //  TODO this._element.querySelector(`.trip-icon`).addEventListener(...) не навешивается на .trip-point.. при варианте this._element.querySelector(`юtrip-point`).addEventListener(...) даже не рендерится
+  bind() {
+    this._element.querySelector(`form`).addEventListener(`submit`, this._onSaveButtonClick.bind(this));
+    this._element.querySelector(`form`).addEventListener(`reset`, this._onResetButtonClick.bind(this));
+  }
+  unbind() {
+    this._element.querySelector(`form`).removeEventListener(`submit`, this._onSaveButtonClick.bind(this));
+    this._element.querySelector(`form`).removeEventListener(`reset`, this._onResetButtonClick.bind(this));
+  }
 
-    <section class="trip-controls">
-      <nav class="trip-controls__menus view-switch">
-        <a href="#table" class="view-switch__item view-switch__item--active">Table</a>
-        <a href="#stats" class="view-switch__item">Stats</a>
+  _onSaveButtonClick(evt) {
+    evt.preventDefault();
+    if (typeof this._onSubmit === `function`) {
+      this._onSubmit();
+    }
+  }
+  _onResetButtonClick(evt) {
+    evt.preventDefault();
+    if (typeof this._onSubmit === `function`) {
+      this._onSubmit();
+    }
+  }
+  set onSubmit(fn) {
+    this._onSubmit = fn;
+  }
+  get element() {
+    return this._element;
+  }
+  unrender() {
+    this.unbind();
+    this._element = null;
+  }
 
-        <form class="trip-filter">
-        </form>
-      </nav>
+  get template2() {
+    return (`<article class="trip-point"> 
+    <i class="trip-icon" >${this._icon} </i>
+    <h3 class="trip-point__title" >${this._title} </h3>
+    <p class="trip-point__schedule" >
+      ${this._timeSectionRender(this._timeShift, this._duration)}
+    </p>
+    <p  class = "trip-point__price" > &euro; &nbsp; ${this._price}</p>
+    ${this._offerRender(this._offers)}</article>`.trim());
+  }
 
-      <button class="trip-controls__new-event new-event">+ New Event</button>
-    </section>
-  </div>
-</header>
-
-
-<main class="main content-wrap" id="table">
-  <form class="trip-sorting">
-    <input type="radio" name="trip-sorting" id="sorting-event" value="event" checked>
-    <label class="trip-sorting__item trip-sorting__item--event" for="sorting-event">Event</label>
-
-    <input type="radio" name="trip-sorting" id="sorting-time" value="time">
-    <label class="trip-sorting__item trip-sorting__item--time" for="sorting-time">Time</label>
-
-    <input type="radio" name="trip-sorting" id="sorting-price" value="price">
-    <label class="trip-sorting__item trip-sorting__item--price" for="sorting-price">Price</label>
-
-    <span class="trip-sorting__item trip-sorting__item--offers">Offers</span>
-  </form>
-
-  <section class="trip-points">
-    <section class="trip-day">
-      <article class="trip-day__info">
-        <span class="trip-day__caption">Day</span>
-        <p class="trip-day__number">1</p>
-        <h2 class="trip-day__title">Mar 18</h2>
-      </article>
-
-      <div class="trip-day__items">
-        <article class="point">
+  get template() {
+    return (` <article class="point">
           <form action="" method="get">
             <header class="point__header">
               <label class="point__date">
@@ -172,13 +168,50 @@
               <input type="hidden" class="point__total-price" name="total-price" value="">
             </section>
           </form>
-        </article>
+        </article>`.trim());
+  }
 
 
-      </div>
-    </section>
-  </section>
-</main>
-<script src="./bundle.js"></script>
-</body>
-</html>
+  _offerRender(arr) {
+
+    if (arr.length > 2) {
+      let newItems = [];
+      for (let i = 0; i < Math.round(Math.random() * 2); i++) {
+        let idx = Math.floor(Math.random() * arr.length);
+        newItems.push(arr[idx]);
+        arr.splice(idx, 1);
+      }
+      arr = newItems;
+    }
+    let offers = `<ul class="trip-point__offers">`;
+    for (let offer of arr) {
+      offers += `<li><button class="trip-point__offer">`;
+      offers += offer;
+      offers += `</button></li>`;
+    }
+    offers += `</ul>`;
+    return offers;
+  }
+
+
+  _timeSectionRender(timeShift, duration) {
+    let timeStart = new Date(timeShift);
+    let durationTemp = new Date(duration);
+    let endTime = new Date(timeShift + duration);
+
+    let timeStartHours = timeStart.getHours();
+    let timeStartMinutes = timeStart.getMinutes();
+    let timeEndHours = endTime.getHours();
+    let timeEndMinutes = endTime.getMinutes();
+    let durationHours = durationTemp.getUTCHours();
+    let durationMinutes = durationTemp.getMinutes();
+    return `<span class="trip-point__timetable">${timeStartHours}:${timeStartMinutes}&nbsp;&mdash; ${timeEndHours}:${timeEndMinutes}</span>
+            <span class="trip-point__duration">${durationHours.toLocaleString()}h ${durationMinutes.toLocaleString()}m</span>`;
+  }
+
+  render() {
+    this._element = createElement(this.template);
+    this.bind();
+    return this._element;
+  }
+}

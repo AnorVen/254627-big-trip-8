@@ -1,3 +1,5 @@
+import {createElement} from '../createElement';
+
 export class TripPoint {
   constructor({icon, title, timestart, duration, price, offers}, timeShift = timestart) {
     this._icon = icon;
@@ -7,6 +9,44 @@ export class TripPoint {
     this._price = price;
     this._offers = offers;
     this._timeShift = timeShift;
+
+    this._element = null;
+    this._onEdit = null;
+  }
+  //  TODO this._element.querySelector(`.trip-icon`).addEventListener(...) не навешивается на .trip-point.. при варианте this._element.querySelector(`юtrip-point`).addEventListener(...) даже не рендерится
+  bind() {
+    this._element.querySelector(`.trip-icon`).addEventListener(`click`, this._onEditButtonClick.bind(this));
+  }
+  unbind() {
+    this._element.querySelector(`.trip-icon`).removeEventListener(`click`, this._onEditButtonClick.bind(this));
+  }
+
+  _onEditButtonClick() {
+    if (typeof this._onEdit === `function`) {
+      this._onEdit();
+    }
+  }
+
+  set onEdit(fn) {
+    this._onEdit = fn;
+  }
+  get element() {
+    return this._element;
+  }
+  unrender() {
+    this.unbind();
+    this._element = null;
+  }
+
+  get template() {
+    return (`<article class="trip-point"> 
+    <i class="trip-icon" >${this._icon} </i>
+    <h3 class="trip-point__title" >${this._title} </h3>
+    <p class="trip-point__schedule" >
+      ${this._timeSectionRender(this._timeShift, this._duration)}
+    </p>
+    <p  class = "trip-point__price" > &euro; &nbsp; ${this._price}</p>
+    ${this._offerRender(this._offers)}</article>`.trim());
   }
 
   _offerRender(arr) {
@@ -32,7 +72,6 @@ export class TripPoint {
 
 
   _timeSectionRender(timeShift, duration) {
-    // TODO  const time = (timeShift) => ();
     let timeStart = new Date(timeShift);
     let durationTemp = new Date(duration);
     let endTime = new Date(timeShift + duration);
@@ -48,14 +87,8 @@ export class TripPoint {
   }
 
   render() {
-    return (`<article class = "trip-point" > <i class = "trip-icon" >${this._icon} </i>
-    <h3 class = "trip-point__title" >${this._title} </h3>
-    <p class = "trip-point__schedule" >
-    ${this._timeSectionRender(this._timeShift, this._duration)}
-    </p>
-    <p  class = "trip-point__price" > &euro; &nbsp; ${this._price}</p>
-  ${this._offerRender(this._offers)}
-</article>
- `);
+    this._element = createElement(this.template);
+    this.bind();
+    return this._element;
   }
 }
