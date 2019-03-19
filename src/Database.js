@@ -59,39 +59,11 @@ export const DB = {
       price: `${Math.floor(Math.random() * 201)}`,
       offers: POINT_VARIABLES.offers,
     },
-    /*  {
-      icon:
-        POINT_VARIABLES.icon[
-          Object.keys(POINT_VARIABLES.icon)[
-            Math.floor(Math.random() * Object.keys(POINT_VARIABLES.icon).length)
-          ]
-        ],
-      title: POINT_VARIABLES.title[Math.floor(Math.random() * POINT_VARIABLES.title.length)],
-      timestart: POINT_VARIABLES.timestart,
-     duration: Math.round(Math.random() * 60 * 60 * 24 * 1000),
-      price: `${Math.floor(Math.random() * 201)}`,
-      offers: POINT_VARIABLES.offers,
-    },
     {
       icon:
         POINT_VARIABLES.icon[
           Object.keys(POINT_VARIABLES.icon)[
-            Math.floor(Math.random() * Object.keys(POINT_VARIABLES.icon).length)
-          ]
-        ],
-      title: POINT_VARIABLES.title[Math.floor(Math.random() * POINT_VARIABLES.title.length)],
-      timestart: POINT_VARIABLES.timestart,
-     duration: Math.round(Math.random() * 60 * 60 * 24 * 1000),
-      price: `${Math.floor(Math.random() * 201)}`,
-      offers: POINT_VARIABLES.offers,
-    },
-    {
-      icon:
-        POINT_VARIABLES.icon[
-          Object.keys(POINT_VARIABLES.icon)[
-            Math.floor(Math.random() * Object.keys(POINT_VARIABLES.icon).length)
-          ]
-        ],
+            Math.floor(Math.random() * Object.keys(POINT_VARIABLES.icon).length)]],
       title: POINT_VARIABLES.title[Math.floor(Math.random() * POINT_VARIABLES.title.length)],
       timestart: POINT_VARIABLES.timestart,
       duration: Math.round(Math.random() * 60 * 60 * 24 * 1000),
@@ -102,9 +74,7 @@ export const DB = {
       icon:
         POINT_VARIABLES.icon[
           Object.keys(POINT_VARIABLES.icon)[
-            Math.floor(Math.random() * Object.keys(POINT_VARIABLES.icon).length)
-          ]
-        ],
+            Math.floor(Math.random() * Object.keys(POINT_VARIABLES.icon).length)]],
       title: POINT_VARIABLES.title[Math.floor(Math.random() * POINT_VARIABLES.title.length)],
       timestart: POINT_VARIABLES.timestart,
       duration: Math.round(Math.random() * 60 * 60 * 24 * 1000),
@@ -115,14 +85,34 @@ export const DB = {
       icon:
         POINT_VARIABLES.icon[
           Object.keys(POINT_VARIABLES.icon)[
-            Math.floor(Math.random() * Object.keys(POINT_VARIABLES.icon).length)
-          ]
-        ],
+            Math.floor(Math.random() * Object.keys(POINT_VARIABLES.icon).length)]],
       title: POINT_VARIABLES.title[Math.floor(Math.random() * POINT_VARIABLES.title.length)],
       timestart: POINT_VARIABLES.timestart,
       duration: Math.round(Math.random() * 60 * 60 * 24 * 1000),
       price: `${Math.floor(Math.random() * 201)}`,
       offers: POINT_VARIABLES.offers,
-    },*/
+    },
+    {
+      icon:
+        POINT_VARIABLES.icon[
+          Object.keys(POINT_VARIABLES.icon)[
+            Math.floor(Math.random() * Object.keys(POINT_VARIABLES.icon).length)]],
+      title: POINT_VARIABLES.title[Math.floor(Math.random() * POINT_VARIABLES.title.length)],
+      timestart: POINT_VARIABLES.timestart,
+      duration: Math.round(Math.random() * 60 * 60 * 24 * 1000),
+      price: `${Math.floor(Math.random() * 201)}`,
+      offers: POINT_VARIABLES.offers,
+    },
+    {
+      icon:
+        POINT_VARIABLES.icon[
+          Object.keys(POINT_VARIABLES.icon)[
+            Math.floor(Math.random() * Object.keys(POINT_VARIABLES.icon).length)]],
+      title: POINT_VARIABLES.title[Math.floor(Math.random() * POINT_VARIABLES.title.length)],
+      timestart: POINT_VARIABLES.timestart,
+      duration: Math.round(Math.random() * 60 * 60 * 24 * 1000),
+      price: `${Math.floor(Math.random() * 201)}`,
+      offers: POINT_VARIABLES.offers,
+    },
   ],
 };

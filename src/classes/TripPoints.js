@@ -1,7 +1,7 @@
-import {createElement} from '../createElement';
-
-export class TripPoint {
+import Component from './Component';
+export class TripPoint extends Component {
   constructor({icon, title, timestart, duration, price, offers}, timeShift = timestart) {
+    super();
     this._icon = icon;
     this._title = title;
     this._timestart = timestart;
@@ -29,13 +29,6 @@ export class TripPoint {
 
   set onEdit(fn) {
     this._onEdit = fn;
-  }
-  get element() {
-    return this._element;
-  }
-  unrender() {
-    this.unbind();
-    this._element = null;
   }
 
   get template() {
@@ -84,11 +77,5 @@ export class TripPoint {
     let durationMinutes = durationTemp.getMinutes();
     return `<span class="trip-point__timetable">${timeStartHours}:${timeStartMinutes}&nbsp;&mdash; ${timeEndHours}:${timeEndMinutes}</span>
             <span class="trip-point__duration">${durationHours.toLocaleString()}h ${durationMinutes.toLocaleString()}m</span>`;
-  }
-
-  render() {
-    this._element = createElement(this.template);
-    this.bind();
-    return this._element;
   }
 }
