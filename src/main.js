@@ -17,9 +17,9 @@ function filtersRender(arr) {
 
 function tasksRender(arr) {
   let timeShift = arr[0].timestart;
-  for (let i = 0; i < arr.length; i++) {
-    let tripPoint = new TripPoint(arr[i], timeShift);
-    let tripPointEdit = new TripPointEdit(arr[i], timeShift);
+  for (let i = 0; i < 2; i++) {
+    let tripPoint = new TripPoint({id : i, timeShift : timeShift, ...arr[i]});
+    let tripPointEdit = new TripPointEdit({id : i, timeShift : timeShift, ...arr[i]});
     TripPointsList.appendChild(tripPoint.render());
 
     tripPoint.onEdit = () => {
@@ -28,7 +28,18 @@ function tasksRender(arr) {
       tripPoint.unrender();
     };
 
-    tripPointEdit.onSubmit = () => {
+    tripPointEdit.onSubmit = (newObject) => {
+      let point = {};
+      point.id = newObject.id;
+      point.icon = newObject.icon;
+      point.title = newObject.title;
+      point.timestart = newObject.timestart;
+      point.duration = newObject.duration;
+      point.price = newObject.price;
+      point.offers = newObject.offers;
+      point.timeShift = newObject.timeShift;
+
+      tripPoint.update(point);
       tripPoint.render();
       TripPointsList.replaceChild(tripPoint.element, tripPointEdit.element);
       tripPointEdit.unrender();

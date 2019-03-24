@@ -1,3 +1,4 @@
+import moment from 'moment';
 export const POINT_VARIABLES = {
   icon: {
     Taxi: `🚕`,
@@ -43,7 +44,6 @@ export const DB = {
             Math.floor(Math.random() * Object.keys(POINT_VARIABLES.icon).length)]],
       title: POINT_VARIABLES.title[Math.floor(Math.random() * POINT_VARIABLES.title.length)],
       timestart: POINT_VARIABLES.timestart,
-      // TODO  duration: Math.round(Math.random() * 60 * 60 * 24 * 1000),
       duration: Math.round(Math.random() * 60 * 60 * 24 * 1000),
       price: `${Math.floor(Math.random() * 201)}`,
       offers: POINT_VARIABLES.offers,

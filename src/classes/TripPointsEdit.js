@@ -1,7 +1,8 @@
 import Component from './Component';
 export class TripPointEdit extends Component {
-  constructor({icon, title, timestart, duration, price, offers}, timeShift = timestart) {
+  constructor({id, icon, title, timestart, duration, price, offers}, timeShift = timestart) {
     super();
+    this._id = id;
     this._icon = icon;
     this._title = title;
     this._timestart = timestart;
@@ -11,7 +12,6 @@ export class TripPointEdit extends Component {
     this._timeShift = timeShift;
     this._element = null;
   }
-  //  TODO this._element.querySelector(`.trip-icon`).addEventListener(...) не навешивается на .trip-point.. при варианте this._element.querySelector(`юtrip-point`).addEventListener(...) даже не рендерится
   bind() {
     this._element.querySelector(`form`).addEventListener(`submit`, this._onSaveButtonClick.bind(this));
     this._element.querySelector(`form`).addEventListener(`reset`, this._onResetButtonClick.bind(this));
@@ -40,6 +40,7 @@ export class TripPointEdit extends Component {
     return (` <article class="point">
           <form action="" method="get">
             <header class="point__header">
+             <input type="hidden" class="visually-hidden" value="${this._id}">
               <label class="point__date">
                 choose day
                 <input class="point__input" type="text" placeholder="MAR 18" name="day">
@@ -52,25 +53,52 @@ export class TripPointEdit extends Component {
 
                 <div class="travel-way__select">
                   <div class="travel-way__select-group">
-                    <input class="travel-way__select-input visually-hidden" type="radio" id="travel-way-taxi" name="travel-way" value="taxi">
-                    <label class="travel-way__select-label" for="travel-way-taxi">🚕 taxi</label>
+                    <input class="travel-way__select-input visually-hidden" type="radio" id="travel-way-taxi-${this._id}" 
+                    name="travel-way-${this._id}"
+                    value="taxi">
+                    <label class="travel-way__select-label" 
+                      for="travel-way-taxi-${this._id}">🚕 taxi</label>
 
-                    <input class="travel-way__select-input visually-hidden" type="radio" id="travel-way-bus" name="travel-way" value="bus">
-                    <label class="travel-way__select-label" for="travel-way-bus">🚌 bus</label>
+                    <input class="travel-way__select-input visually-hidden" 
+                      type="radio" 
+                      id="travel-way-bus-${this._id}" 
+                      name="travel-way-${this._id}" 
+                      value="bus">
+                    <label class="travel-way__select-label"
+                     for="travel-way-bus-${this._id}">🚌 bus</label>
 
-                    <input class="travel-way__select-input visually-hidden" type="radio" id="travel-way-train" name="travel-way" value="train">
-                    <label class="travel-way__select-label" for="travel-way-train">🚂 train</label>
-
-                    <input class="travel-way__select-input visually-hidden" type="radio" id="travel-way-flight" name="travel-way" value="train" checked>
-                    <label class="travel-way__select-label" for="travel-way-flight">✈️ flight</label>
+                    <input class="travel-way__select-input visually-hidden" 
+                      type="radio" 
+                      id="travel-way-train-${this._id}"
+                      name="travel-way-${this._id}" 
+                      value="train">
+                    <label class="travel-way__select-label"
+                      for="travel-way-train-${this._id}">🚂 train</label>
+                      
+                    <input class="travel-way__select-input visually-hidden"
+                      type="radio"
+                       id="travel-way-flight-${this._id}" 
+                       name="travel-way-${this._id}" 
+                       value="flight" checked>
+                    <label class="travel-way__select-label" 
+                    for="travel-way-flight-${this._id}">✈️ flight</label>
                   </div>
 
                   <div class="travel-way__select-group">
-                    <input class="travel-way__select-input visually-hidden" type="radio" id="travel-way-check-in" name="travel-way" value="check-in">
-                    <label class="travel-way__select-label" for="travel-way-check-in">🏨 check-in</label>
+                    <input class="travel-way__select-input visually-hidden" 
+                      type="radio" 
+                      id="travel-way-check-in-${this._id}" 
+                      name="travel-way-${this._id}" 
+                      value="check-in">
+                    <label class="travel-way__select-label" 
+                      for="travel-way-check-in-${this._id}">🏨 check-in</label>
 
-                    <input class="travel-way__select-input visually-hidden" type="radio" id="travel-way-sightseeing" name="travel-way" value="sight-seeing">
-                    <label class="travel-way__select-label" for="travel-way-sightseeing">🏛 sightseeing</label>
+                    <input class="travel-way__select-input visually-hidden" 
+                      type="radio" id="travel-way-sightseeing-${this._id}" 
+                      name="travel-way-${this._id}" 
+                      value="sight-seeing">
+                    <label class="travel-way__select-label" 
+                      for="travel-way-sightseeing-${this._id}">🏛 sightseeing</label>
                   </div>
                 </div>
               </div>
