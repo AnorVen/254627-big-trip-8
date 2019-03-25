@@ -1,3 +1,4 @@
+import moment from 'moment';
 import Component from './Component';
 export class TripPoint extends Component {
   constructor({id, icon, title, timestart, duration, price, offers, timeShift = timestart}) {
@@ -30,7 +31,16 @@ export class TripPoint extends Component {
   set onEdit(fn) {
     this._onEdit = fn;
   }
-
+  update(data) {
+    this._id = data.id;
+    this._icon = data.icon;
+    this._title = data.title;
+    this._timestart = data.timestart;
+    this._duration = data.duration;
+    this._price = data.price;
+    this._offers = data.offers;
+    this._timeShift = data.timeShift;
+  }
   get template() {
     return (`<article class="trip-point"> 
     <i class="trip-icon" >${this._icon} </i>
@@ -66,17 +76,17 @@ export class TripPoint extends Component {
 
 
   _timeSectionRender(timeShift, duration) {
-    let timeStart = new Date(timeShift);
-    let durationTemp = new Date(duration);
-    let endTime = new Date(timeShift + duration);
+    let timeStart = moment(timeShift);
+    let durationTemp = moment(duration);
+    let endTime = moment(timeStart.toDate().getTime() + durationTemp.toDate().getTime());
 
-    let timeStartHours = timeStart.getHours();
-    let timeStartMinutes = timeStart.getMinutes();
-    let timeEndHours = endTime.getHours();
-    let timeEndMinutes = endTime.getMinutes();
-    let durationHours = durationTemp.getUTCHours();
-    let durationMinutes = durationTemp.getMinutes();
+    let timeStartHours = timeStart.hour();
+    let timeStartMinutes = timeStart.minute();
+    let timeEndHours = endTime.hour();
+    let timeEndMinutes = endTime.minute();
+    let durationHours = durationTemp.hour();
+    let durationMinutes = durationTemp.minute();
     return `<span class="trip-point__timetable">${timeStartHours}:${timeStartMinutes}&nbsp;&mdash; ${timeEndHours}:${timeEndMinutes}</span>
-            <span class="trip-point__duration">${durationHours.toLocaleString()}h ${durationMinutes.toLocaleString()}m</span>`;
+            <span class="trip-point__duration">${durationHours}h ${durationMinutes}m</span>`;
   }
 }

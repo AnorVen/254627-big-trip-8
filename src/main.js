@@ -2,6 +2,7 @@ import {TripPoint} from './classes/TripPoints';
 import {TripPointEdit} from './classes/TripPointsEdit';
 import {Filters} from './classes/Filters';
 import {POINT_VARIABLES, DB} from './Database';
+import moment from 'moment'
 
 
 const MainFilter = document.querySelector(`.trip-filter`);
@@ -16,8 +17,13 @@ function filtersRender(arr) {
 }
 
 function tasksRender(arr) {
-  let timeShift = arr[0].timestart;
-  for (let i = 0; i < 2; i++) {
+
+
+
+
+
+  let timeShift = moment(arr[0].timestart).toDate().getTime();
+  for (let i = 0; i < 1; i++) {
     let tripPoint = new TripPoint({id : i, timeShift : timeShift, ...arr[i]});
     let tripPointEdit = new TripPointEdit({id : i, timeShift : timeShift, ...arr[i]});
     TripPointsList.appendChild(tripPoint.render());
@@ -45,7 +51,11 @@ function tasksRender(arr) {
       tripPointEdit.unrender();
     };
 
-    timeShift += arr[i].duration;
+
+    var end = moment(arr[i].duration).toDate().getTime();
+    var timespan = timeShift + end;
+     timeShift = moment(timespan);
+    debugger
   }
 }
 
