@@ -37,7 +37,7 @@ function tasksRender(arr) {
 
     let tripPoint = new TripPoint({id : i, ...arr[i]});
     let tripPointEdit = new TripPointEdit({id : i, ...arr[i]});
-    TripPointsList.appendChild(tripPoint.render());
+    TripPointsList.appendChild(tripPointEdit.render());
 
     tripPoint.onEdit = () => {
       tripPointEdit.render();
@@ -61,10 +61,7 @@ function tasksRender(arr) {
       TripPointsList.replaceChild(tripPoint.element, tripPointEdit.element);
       tripPointEdit.unrender();
     };
-
-
     minTimeStart = moment(arr[i].timeend);
-    debugger
   }
 }
 

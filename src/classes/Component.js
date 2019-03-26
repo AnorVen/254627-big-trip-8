@@ -17,17 +17,23 @@ export default class Component {
     throw new Error(`You have to define template.`);
   }
 
-  render() {
-    this._element = createElement(this.template);
-    this.bind();
-    return this._element;
-  }
+
   bind() {
   }
 
   unbind() {
   }
 
+  setState(newState) {
+    this._state = newState;
+  }
+
+
+  render() {
+    this._element = createElement(this.template);
+    this.bind();
+    return this._element;
+  }
   unrender() {
     this.unbind();
     this._element.remove();

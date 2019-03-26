@@ -1,4 +1,8 @@
 import Component from './Component';
+import moment from 'moment';
+import flatpickr from 'flatpickr';
+import {POINT_VARIABLES} from '../Database';
+
 export class TripPointEdit extends Component {
   constructor({id, icon, title, timestart, timeend, price, offers}) {
     super();
@@ -14,12 +18,63 @@ export class TripPointEdit extends Component {
   bind() {
     this._element.querySelector(`form`).addEventListener(`submit`, this._onSaveButtonClick.bind(this));
     this._element.querySelector(`form`).addEventListener(`reset`, this._onResetButtonClick.bind(this));
+    this._element.querySelector(`.travel-way__select`).addEventListener(`click`, this.onIconChange.bind(this));
+
+    // Date Input
+    const dateInput = this._element.querySelector(`.point__date .point__input`);
+    dateInput.flatpickr({
+      dateFormat: `m d`,
+      mode: `range`,
+      defaultDate: moment(this._timestart).format(`MM DD`),
+      onChange: (dateObj) => {
+        dateInput.dataset.date = dateObj.toString();
+      }
+    });
+
+    // Time Range
+    this._element.querySelector(`.point__time .point__input`).flatpickr({
+      locale: {
+        rangeSeparator: ` — `
+      },
+      mode: `range`,
+      enableTime: true,
+      dateFormat: `H:i`,
+      time_24hr: true,
+      defaultDate: [moment(this._timestart).format(`HH:MM YYYY MM DD `),
+        moment(this._timeend).format(`HH:MM YYYY MM DD `)],
+      minuteIncrement: 10,
+      onClose: (dateObj) => {
+        this._timestart = dateObj[0];
+        this._timeend = dateObj[1];
+        this.reRender();
+      }
+    });
   }
+
+
   unbind() {
     this._element.querySelector(`form`).removeEventListener(`submit`, this._onSaveButtonClick.bind(this));
     this._element.querySelector(`form`).removeEventListener(`reset`, this._onResetButtonClick.bind(this));
+
+    this._element.querySelector(`.travel-way__select`).removeEventListener(`click`, this.onIconChange.bind(this));
+
   }
 
+  onIconChange(e) {
+    if (e.target.tagName === `INPUT`) {
+      this._icon = e.target.value;
+      this.reRender();
+    }
+  }
+  reRender() {
+    this.unbind();
+    this._partialUpdate();
+    this.bind();
+  }
+
+  _partialUpdate() {
+    this._element.innerHTML = this.template;
+  }
   _onSaveButtonClick(evt) {
     evt.preventDefault();
     if (typeof this._onSubmit === `function`) {
@@ -37,8 +92,12 @@ export class TripPointEdit extends Component {
   }
   get template() {
     return (` <article class="point">
+         <div><p>${moment(this._timestart).format(`DD MM HH:mm`)}</p>
+              <p>${moment(this._timeend).format(`DD MM HH:mm`)}</p></div>
+    
           <form action="" method="get">
             <header class="point__header">
+    
              <input type="hidden" class="visually-hidden" value="${this._id}">
               <label class="point__date">
                 choose day
@@ -46,39 +105,48 @@ export class TripPointEdit extends Component {
               </label>
 
               <div class="travel-way">
-                <label class="travel-way__label" for="travel-way__toggle">✈️</label>
+                <label class="travel-way__label" for="travel-way__toggle">${POINT_VARIABLES.icon[this._icon.toLowerCase()]}️</label>
 
                 <input type="checkbox" class="travel-way__toggle visually-hidden" id="travel-way__toggle">
 
                 <div class="travel-way__select">
                   <div class="travel-way__select-group">
-                    <input class="travel-way__select-input visually-hidden" type="radio" id="travel-way-taxi-${this._id}" 
-                    name="travel-way-${this._id}"
-                    value="taxi">
-                    <label class="travel-way__select-label" 
-                      for="travel-way-taxi-${this._id}">🚕 taxi</label>
+                  <input class="travel-way__select-input visually-hidden" 
+                  type="radio" 
+                  ${this._icon === `flight` && `checked`}
+                  value="taxi"
+                  id="travel-way-taxi-${this._id}" 
+                  name="travel-way-${this._id}">
+                   
+                      <label class="travel-way__select-label"
+                   for="travel-way-taxi-${this._id}">🚕 taxi</label>
 
                     <input class="travel-way__select-input visually-hidden" 
                       type="radio" 
                       id="travel-way-bus-${this._id}" 
                       name="travel-way-${this._id}" 
-                      value="bus">
-                    <label class="travel-way__select-label"
-                     for="travel-way-bus-${this._id}">🚌 bus</label>
+                         ${this._icon === `bus` && `checked`}
+                        value="bus">
+                      <label class="travel-way__select-label"
+                       for="travel-way-bus-${this._id}">🚌 bus</label>
 
                     <input class="travel-way__select-input visually-hidden" 
                       type="radio" 
                       id="travel-way-train-${this._id}"
                       name="travel-way-${this._id}" 
-                      value="train">
-                    <label class="travel-way__select-label"
-                      for="travel-way-train-${this._id}">🚂 train</label>
+                      value="train"
+                        ${this._icon === `train` && `checked`}
+                        >
+                      <label class="travel-way__select-label"
+                        for="travel-way-train-${this._id}">🚂 train</label>
                       
                     <input class="travel-way__select-input visually-hidden"
                       type="radio"
                        id="travel-way-flight-${this._id}" 
                        name="travel-way-${this._id}" 
-                       value="flight" checked>
+                       value="flight"
+                       ${this._icon === `flight` && `checked`}
+                       >
                     <label class="travel-way__select-label" 
                     for="travel-way-flight-${this._id}">✈️ flight</label>
                   </div>
@@ -88,14 +156,16 @@ export class TripPointEdit extends Component {
                       type="radio" 
                       id="travel-way-check-in-${this._id}" 
                       name="travel-way-${this._id}" 
-                      value="check-in">
+                         ${this._icon === `checkin` && `checked`}
+                      value="checkin">
                     <label class="travel-way__select-label" 
                       for="travel-way-check-in-${this._id}">🏨 check-in</label>
 
                     <input class="travel-way__select-input visually-hidden" 
                       type="radio" id="travel-way-sightseeing-${this._id}" 
                       name="travel-way-${this._id}" 
-                      value="sight-seeing">
+                         ${this._icon === `sightseeing` && `checked`}
+                      value="sightseeing">
                     <label class="travel-way__select-label" 
                       for="travel-way-sightseeing-${this._id}">🏛 sightseeing</label>
                   </div>
@@ -103,7 +173,7 @@ export class TripPointEdit extends Component {
               </div>
 
               <div class="point__destination-wrap">
-                <label class="point__destination-label" for="destination">Flight to</label>
+                <label class="point__destination-label" for="destination">${this._icon} to</label>
                 <input class="point__destination-input" list="destination-select" id="destination" value="Chamonix" name="destination">
                 <datalist id="destination-select">
                   <option value="airport"></option>
