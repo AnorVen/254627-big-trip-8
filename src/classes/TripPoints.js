@@ -1,16 +1,16 @@
 import moment from 'moment';
+import momentDurationFormatSetup from 'moment-duration-format';
 import Component from './Component';
 export class TripPoint extends Component {
-  constructor({id, icon, title, timestart, duration, price, offers, timeShift = timestart}) {
+  constructor({id, icon, title, timestart, timeend, price, offers}) {
     super();
     this._id = id;
     this._icon = icon;
     this._title = title;
     this._timestart = timestart;
-    this._duration = duration;
+    this._timeend = timeend;
     this._price = price;
     this._offers = offers;
-    this._timeShift = timeShift;
 
     this._element = null;
     this._onEdit = null;
@@ -36,7 +36,7 @@ export class TripPoint extends Component {
     this._icon = data.icon;
     this._title = data.title;
     this._timestart = data.timestart;
-    this._duration = data.duration;
+    this._timeend = data.timeend;
     this._price = data.price;
     this._offers = data.offers;
     this._timeShift = data.timeShift;
@@ -47,7 +47,7 @@ export class TripPoint extends Component {
     <input type="hidden" class="visually-hidden" value="${this._id}">
     <h3 class="trip-point__title" >${this._title} </h3>
     <p class="trip-point__schedule" >
-      ${this._timeSectionRender(this._timeShift, this._duration)}
+      ${this._timeSectionRender(this._timestart, this._timeend)}
     </p>
     <p  class = "trip-point__price" > &euro; &nbsp; ${this._price}</p>
     ${this._offerRender(this._offers)}</article>`.trim());
@@ -75,18 +75,13 @@ export class TripPoint extends Component {
   }
 
 
-  _timeSectionRender(timeShift, duration) {
-    let timeStart = moment(timeShift);
-    let durationTemp = moment(duration);
-    let endTime = moment(timeStart.toDate().getTime() + durationTemp.toDate().getTime());
+  _timeSectionRender(timestart, timeend) {
+    let timeStart = moment(timestart).format(`MM DD HH:mm`);
+    let timeEnd = moment(timeend).format(`MM DD HH:mm`);
+    let timeShift = moment.duration(moment(timeend).diff(moment(timestart))).format(`hh[h]: mm[m]`);
 
-    let timeStartHours = timeStart.hour();
-    let timeStartMinutes = timeStart.minute();
-    let timeEndHours = endTime.hour();
-    let timeEndMinutes = endTime.minute();
-    let durationHours = durationTemp.hour();
-    let durationMinutes = durationTemp.minute();
-    return `<span class="trip-point__timetable">${timeStartHours}:${timeStartMinutes}&nbsp;&mdash; ${timeEndHours}:${timeEndMinutes}</span>
-            <span class="trip-point__duration">${durationHours}h ${durationMinutes}m</span>`;
+
+    return `<span class="trip-point__timetable">${timeStart}&nbsp;&mdash; ${timeEnd}</span>
+            <span class="trip-point__duration">${timeShift}</span>`;
   }
 }

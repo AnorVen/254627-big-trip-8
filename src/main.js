@@ -22,10 +22,21 @@ function tasksRender(arr) {
 
 
 
-  let timeShift = moment(arr[0].timestart).toDate().getTime();
-  for (let i = 0; i < 1; i++) {
-    let tripPoint = new TripPoint({id : i, timeShift : timeShift, ...arr[i]});
-    let tripPointEdit = new TripPointEdit({id : i, timeShift : timeShift, ...arr[i]});
+  let minTimeStart = moment(arr[0].timestart);
+  for (let i = 0; i < 2; i++) {
+    //проверка что старт точно раньше окончания
+    if(arr[i].timestart > arr[i].timeend){
+      [arr[i].timestart, arr[i].timeend] = [arr[i].timeend, arr[i].timestart]
+    }
+    //проверка что начало следующего таска не раньше конца предыдущего
+    if( minTimeStart  > moment(arr[i].timestart) ){
+      let tempTime = arr[i].timeend - arr[i].timestart;
+     arr[i].timestart = moment(minTimeStart);
+     arr[i].timeend = moment(minTimeStart).add(tempTime,'ms');
+    }
+
+    let tripPoint = new TripPoint({id : i, ...arr[i]});
+    let tripPointEdit = new TripPointEdit({id : i, ...arr[i]});
     TripPointsList.appendChild(tripPoint.render());
 
     tripPoint.onEdit = () => {
@@ -40,7 +51,7 @@ function tasksRender(arr) {
       point.icon = newObject.icon;
       point.title = newObject.title;
       point.timestart = newObject.timestart;
-      point.duration = newObject.duration;
+      point.timeend = newObject.timeend;
       point.price = newObject.price;
       point.offers = newObject.offers;
       point.timeShift = newObject.timeShift;
@@ -52,9 +63,7 @@ function tasksRender(arr) {
     };
 
 
-    var end = moment(arr[i].duration).toDate().getTime();
-    var timespan = timeShift + end;
-     timeShift = moment(timespan);
+    minTimeStart = moment(arr[i].timeend);
     debugger
   }
 }

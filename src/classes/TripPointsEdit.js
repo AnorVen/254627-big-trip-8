@@ -1,15 +1,14 @@
 import Component from './Component';
 export class TripPointEdit extends Component {
-  constructor({id, icon, title, timestart, duration, price, offers}, timeShift = timestart) {
+  constructor({id, icon, title, timestart, timeend, price, offers}) {
     super();
     this._id = id;
     this._icon = icon;
     this._title = title;
     this._timestart = timestart;
-    this._duration = duration;
+    this._timeend = timeend;
     this._price = price;
     this._offers = offers;
-    this._timeShift = timeShift;
     this._element = null;
   }
   bind() {
