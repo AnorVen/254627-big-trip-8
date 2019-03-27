@@ -4,7 +4,7 @@ import flatpickr from 'flatpickr';
 import {POINT_VARIABLES} from '../Database';
 
 export class TripPointEdit extends Component {
-  constructor({id, icon, title, timestart, timeend, price, offers}) {
+  constructor({id, icon, title, timestart, timeend, price, offers, isFavorite}) {
     super();
     this._id = id;
     this._icon = icon;
@@ -14,52 +14,66 @@ export class TripPointEdit extends Component {
     this._price = price;
     this._offers = offers;
     this._element = null;
+    this._isFavorite = isFavorite;
+
+    this._journeyPoint = POINT_VARIABLES.title;
   }
   bind() {
-    this._element.querySelector(`form`).addEventListener(`submit`, this._onSaveButtonClick.bind(this));
-    this._element.querySelector(`form`).addEventListener(`reset`, this._onResetButtonClick.bind(this));
-    this._element.querySelector(`.travel-way__select`).addEventListener(`click`, this.onIconChange.bind(this));
-
+    this._element.querySelector(`form`)
+      .addEventListener(`submit`, this._onSaveButtonClick.bind(this));
+    this._element.querySelector(`form`)
+      .addEventListener(`reset`, this._onResetButtonClick.bind(this));
+    this._element.querySelector(`.travel-way__select`)
+      .addEventListener(`click`, this.onIconChange.bind(this));
+    this._element.querySelector(`.point__destination-input`)
+      .addEventListener(`change`, this.onTitleChange.bind(this));
     // Date Input
-    const dateInput = this._element.querySelector(`.point__date .point__input`);
-    dateInput.flatpickr({
-      dateFormat: `m d`,
-      mode: `range`,
-      defaultDate: moment(this._timestart).format(`MM DD`),
-      onChange: (dateObj) => {
-        dateInput.dataset.date = dateObj.toString();
-      }
-    });
+    flatpickr(
+        this._element.querySelector(`.point__date .point__input`),
+        {
+          dateFormat: `m d`,
+          mode: `range`,
+          defaultDate: moment(this._timestart).format(`MM DD`),
+          onChange: (dateObj) => {
+            console.log(dateObj);
+          }
+        });
 
     // Time Range
-    this._element.querySelector(`.point__time .point__input`).flatpickr({
-      locale: {
-        rangeSeparator: ` — `
-      },
-      mode: `range`,
-      enableTime: true,
-      dateFormat: `H:i`,
-      time_24hr: true,
-      defaultDate: [moment(this._timestart).format(`HH:MM YYYY MM DD `),
-        moment(this._timeend).format(`HH:MM YYYY MM DD `)],
-      minuteIncrement: 10,
-      onClose: (dateObj) => {
-        this._timestart = dateObj[0];
-        this._timeend = dateObj[1];
-        this.reRender();
-      }
-    });
+    flatpickr(
+        this._element.querySelector(`.point__time .point__input`),
+        {
+          locale: {
+            rangeSeparator: ` — `
+          },
+          enableTime: true,
+          dateFormat: `H:i`,
+          time_24hr: true,
+          defaultDate: moment(this._timestart).format(`HH:MM YYYY MM DD `),
+          minuteIncrement: 10,
+          onClose: (dateObj) => {
+            this._timestart = dateObj[0];
+            this._timeend = dateObj[1];
+            this.reRender();
+          }
+        });
   }
 
 
   unbind() {
-    this._element.querySelector(`form`).removeEventListener(`submit`, this._onSaveButtonClick.bind(this));
-    this._element.querySelector(`form`).removeEventListener(`reset`, this._onResetButtonClick.bind(this));
-
-    this._element.querySelector(`.travel-way__select`).removeEventListener(`click`, this.onIconChange.bind(this));
+    this._element.querySelector(`form`)
+      .removeEventListener(`submit`, this._onSaveButtonClick.bind(this));
+    this._element.querySelector(`form`)
+      .removeEventListener(`reset`, this._onResetButtonClick.bind(this));
+    this._element.querySelector(`.travel-way__select`)
+      .removeEventListener(`click`, this.onIconChange.bind(this));
 
   }
 
+  onTitleChange(e) {
+    this._title = e.target.value;
+    this.reRender();
+  }
   onIconChange(e) {
     if (e.target.tagName === `INPUT`) {
       this._icon = e.target.value;
@@ -77,10 +91,30 @@ export class TripPointEdit extends Component {
   }
   _onSaveButtonClick(evt) {
     evt.preventDefault();
+    const formData = new FormData(this._element.querySelector(`.tripPointForm`));
+    const newData = this._processForm(formData);
     if (typeof this._onSubmit === `function`) {
-      this._onSubmit();
+      this._onSubmit(newData);
     }
+    this.update(newData);
+
+
   }
+
+  update(data) {
+    this._id = data.id;
+    this._icon = data.icon;
+    this._title = data.title;
+    this._timestart = data.timestart;
+    this._timeend = data.timeend;
+    this._price = data.price;
+    this._offers = data.offers;
+    this._timeShift = data.timeShift;
+    this._isFavorite = data.isFavorite;
+
+  }
+
+
   _onResetButtonClick(evt) {
     evt.preventDefault();
     if (typeof this._onSubmit === `function`) {
@@ -90,24 +124,67 @@ export class TripPointEdit extends Component {
   set onSubmit(fn) {
     this._onSubmit = fn;
   }
+
+  static createMapper(target) {
+    return {
+      id: (value) => (target.id = value),
+      destination: (value) => (target.name = value),
+      time: (value) => (target.time = value),
+      price: (value) => (target.price = value),
+      icon: (value) => (target.icon = value),
+      offers: (value) => (target.offers = value),
+      favorite: (value) => (target.isFavorite = value),
+
+    };
+  }
+
+  _processForm(formData) {
+    const entry = {
+      id: ``,
+      title: ``,
+      icon: ``,
+      offers: {},
+      timestart: ``,
+      price: 0,
+      isFavorite: false,
+    };
+    const TripPointEditMapper = TripPointEdit.createMapper(entry);
+
+    for (const pair of formData.entries()) {
+      const [property, value] = pair;
+      if (TripPointEditMapper[property]) {
+        TripPointEditMapper[property](value);
+      }
+    }
+    debugger
+    return entry;
+  }
+
   get template() {
     return (` <article class="point">
          <div><p>${moment(this._timestart).format(`DD MM HH:mm`)}</p>
               <p>${moment(this._timeend).format(`DD MM HH:mm`)}</p></div>
     
-          <form action="" method="get">
+          <form action="" method="get" class="tripPointForm">
             <header class="point__header">
-    
-             <input type="hidden" class="visually-hidden" value="${this._id}">
+              <input type="hidden" class="visually-hidden" name="id" value="${this._id}">
               <label class="point__date">
                 choose day
                 <input class="point__input" type="text" placeholder="MAR 18" name="day">
               </label>
 
               <div class="travel-way">
-                <label class="travel-way__label" for="travel-way__toggle">${POINT_VARIABLES.icon[this._icon.toLowerCase()]}️</label>
+                <label 
+                  class="travel-way__label" 
+                  for="travel-way__toggle-${this._id}">
+                    ${POINT_VARIABLES.icon[this._icon.toLowerCase()]}️</label>
 
-                <input type="checkbox" class="travel-way__toggle visually-hidden" id="travel-way__toggle">
+                <input 
+                  type="checkbox" 
+                  class="travel-way__toggle visually-hidden" 
+                  name="icon"
+                  value="${this._icon}"
+                  id="travel-way__toggle-${this._id}">
 
                 <div class="travel-way__select">
                   <div class="travel-way__select-group">
@@ -174,12 +251,9 @@ export class TripPointEdit extends Component {
 
               <div class="point__destination-wrap">
                 <label class="point__destination-label" for="destination">${this._icon} to</label>
-                <input class="point__destination-input" list="destination-select" id="destination" value="Chamonix" name="destination">
+                <input class="point__destination-input" list="destination-select" id="destination" value="${this._title}" name="destination">
                 <datalist id="destination-select">
-                  <option value="airport"></option>
-                  <option value="Geneva"></option>
-                  <option value="Chamonix"></option>
-                  <option value="hotel"></option>
+                ${this._journeyPoint.map((item)=>(`<option value="${item}"></option>`).trim()).join(``)}           
                 </datalist>
               </div>
 
@@ -191,7 +265,7 @@ export class TripPointEdit extends Component {
               <label class="point__price">
                 write price
                 <span class="point__price-currency">€</span>
-                <input class="point__input" type="text" value="160" name="price">
+                <input class="point__input" type="text" value="${this._price}" name="price">
               </label>
 
               <div class="point__buttons">
@@ -200,7 +274,7 @@ export class TripPointEdit extends Component {
               </div>
 
               <div class="paint__favorite-wrap">
-                <input type="checkbox" class="point__favorite-input visually-hidden" id="favorite" name="favorite">
+                <input type="checkbox" class="point__favorite-input visually-hidden" id="favorite" name="favorite" ${this._isFavorite && `checked`}>
                 <label class="point__favorite" for="favorite">favorite</label>
               </div>
             </header>
@@ -210,25 +284,7 @@ export class TripPointEdit extends Component {
                 <h3 class="point__details-title">offers</h3>
 
                 <div class="point__offers-wrap">
-                  <input class="point__offers-input visually-hidden" type="checkbox" id="add-luggage" name="offer" value="add-luggage">
-                  <label for="add-luggage" class="point__offers-label">
-                    <span class="point__offer-service">Add luggage</span> + €<span class="point__offer-price">30</span>
-                  </label>
-
-                  <input class="point__offers-input visually-hidden" type="checkbox" id="switch-to-comfort-class" name="offer" value="switch-to-comfort-class">
-                  <label for="switch-to-comfort-class" class="point__offers-label">
-                    <span class="point__offer-service">Switch to comfort class</span> + €<span class="point__offer-price">100</span>
-                  </label>
-
-                  <input class="point__offers-input visually-hidden" type="checkbox" id="add-meal" name="offer" value="add-meal">
-                  <label for="add-meal" class="point__offers-label">
-                    <span class="point__offer-service">Add meal </span> + €<span class="point__offer-price">15</span>
-                  </label>
-
-                  <input class="point__offers-input visually-hidden" type="checkbox" id="choose-seats" name="offer" value="choose-seats">
-                  <label for="choose-seats" class="point__offers-label">
-                    <span class="point__offer-service">Choose seats</span> + €<span class="point__offer-price">5</span>
-                  </label>
+                  ${this._offerRender(this._offers)}
                 </div>
 
               </section>
@@ -250,40 +306,18 @@ export class TripPointEdit extends Component {
   }
 
 
-  _offerRender(arr) {
+  _offerRender(obj) {
+    let tempHTML = ``;
+    for (let item in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, item)) {
+        tempHTML += `
+        <input class="point__offers-input visually-hidden" type="checkbox" id="${item}-${this._id}" name="offer" value="choose-seats"${obj[item].isChecked && `checked`} >
+                  <label for="${item}-${this._id}" class="point__offers-label">
+                    <span class="point__offer-service">${obj[item].title}</span> + €<span class="point__offer-price">${obj[item].price || 0}</span>
+                  </label>`;
 
-    if (arr.length > 2) {
-      let newItems = [];
-      for (let i = 0; i < Math.round(Math.random() * 2); i++) {
-        let idx = Math.floor(Math.random() * arr.length);
-        newItems.push(arr[idx]);
-        arr.splice(idx, 1);
       }
-      arr = newItems;
     }
-    let offers = `<ul class="trip-point__offers">`;
-    for (let offer of arr) {
-      offers += `<li><button class="trip-point__offer">`;
-      offers += offer;
-      offers += `</button></li>`;
-    }
-    offers += `</ul>`;
-    return offers;
-  }
-
-
-  _timeSectionRender(timeShift, duration) {
-    let timeStart = new Date(timeShift);
-    let durationTemp = new Date(duration);
-    let endTime = new Date(timeShift + duration);
-
-    let timeStartHours = timeStart.getHours();
-    let timeStartMinutes = timeStart.getMinutes();
-    let timeEndHours = endTime.getHours();
-    let timeEndMinutes = endTime.getMinutes();
-    let durationHours = durationTemp.getUTCHours();
-    let durationMinutes = durationTemp.getMinutes();
-    return `<span class="trip-point__timetable">${timeStartHours}:${timeStartMinutes}&nbsp;&mdash; ${timeEndHours}:${timeEndMinutes}</span>
-            <span class="trip-point__duration">${durationHours.toLocaleString()}h ${durationMinutes.toLocaleString()}m</span>`;
+    return tempHTML;
   }
 }

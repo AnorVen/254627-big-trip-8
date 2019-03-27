@@ -3,7 +3,7 @@ import momentDurationFormatSetup from 'moment-duration-format'; // без это
 import Component from './Component';
 import {POINT_VARIABLES} from '../Database';
 export class TripPoint extends Component {
-  constructor({id, icon, title, timestart, timeend, price, offers}) {
+  constructor({id, icon, title, timestart, timeend, price, offers, isFavorite}) {
     super();
     this._id = id;
     this._icon = icon;
@@ -12,6 +12,7 @@ export class TripPoint extends Component {
     this._timeend = timeend;
     this._price = price;
     this._offers = offers;
+    this._isFavorite = isFavorite;
 
     this._element = null;
     this._onEdit = null;
@@ -44,7 +45,8 @@ export class TripPoint extends Component {
     this._timeend = data.timeend;
     this._price = data.price;
     this._offers = data.offers;
-    this._timeShift = data.timeShift;
+    this.state.offers = data.offers;
+    this._isFavorite = data.isFavorite;
   }
 
 
@@ -52,7 +54,7 @@ export class TripPoint extends Component {
     return (`<article class="trip-point"> 
     <i class="trip-icon" >${POINT_VARIABLES.icon[this._icon.toLowerCase()]} </i>
     <input type="hidden" class="visually-hidden" value="${this._id}">
-    <h3 class="trip-point__title" >${this._title} </h3>
+    <h3 class="trip-point__title" >${this._icon} to ${this._title}</h3>
     <p class="trip-point__schedule" >
       ${this._timeSectionRender(this._timestart, this._timeend)}
     </p>
@@ -60,45 +62,36 @@ export class TripPoint extends Component {
     ${this._offerRender(this._offers)}</article>`.trim());
   }
 
-  _offerRender(arr) {
-    arr = arr.filter((offer) => offer.isChecked === true);
-    this.setState({
-      offers: arr
-    })
-    if (arr.length > 2) {
-      let newItems = [];
-      for (let i = 0; i < Math.round(Math.random() * 2); i++) {
-        let idx = Math.floor(Math.random() * arr.length);
-        newItems.push(arr[idx]);
-        arr.splice(idx, 1);
+  _offerRender(obj) {
+    let tempHTML = `<ul class="trip-point__offers">`;
+    for (let item in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, item)) {
+        tempHTML += `<li><button class="trip-point__offer">${obj[item].title} + €${obj[item].price}</button></li>`;
       }
-      arr = newItems;
     }
-    let offers = `<ul class="trip-point__offers">`;
-    for (let offer of arr) {
-      offers += `<li><button class="trip-point__offer">`;
-      offers += `${offer.title}+ €${offer.price}`;
-      offers += `</button></li>`;
-    }
-    offers += `</ul>`;
-    return offers;
+    tempHTML += `</ul>`;
+    return tempHTML;
   }
 
 
   get offersPrice() {
-    return Object.keys(this._state.offers).reduce((acc, offer) => {
-      if (this._state.offers[offer].isChecked) {
-        return acc + parseInt(this._state.offers[offer].price, 10);
-      }
-      return acc;
-    }, 0);
+    if (this._state.offers) {
+      return Object.keys(this._state.offers).reduce((acc, offer) => {
+        if (this._state.offers[offer].isChecked) {
+          return acc + parseInt(this._state.offers[offer].price, 10);
+        }
+        return acc;
+      }, 0);
+    }
+    return 0;
   }
 
-  get fullPrice() {
-    return parseInt(this._state.price, 10) + this.offersPrice;
+  fullPrice() {
+    if (this._state.offers) {
+      return parseInt(this._state.price, 10) + this.offersPrice;
+    }
+    return 0;
   }
-
-
 
   _timeSectionRender(timestart, timeend) {
     let timeStart = moment(timestart).format(`DD MM HH:mm`);

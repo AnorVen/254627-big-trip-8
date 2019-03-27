@@ -54,7 +54,8 @@ function tasksRender(arr) {
       point.timeend = newObject.timeend;
       point.price = newObject.price;
       point.offers = newObject.offers;
-      point.timeShift = newObject.timeShift;
+      point.isFavorite = newObject.isFavorite;
+
 
       tripPoint.update(point);
       tripPoint.render();

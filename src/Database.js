@@ -20,7 +20,7 @@ export const POINT_VARIABLES = {
     sightseeing: `🏛️`,
     restaurant: `🍴`,
   },
-  title: [`Taxi to Airport`, `Taxi to Airport`, `Drive to Chamonix`, `Check into a hotel`],
+  title: [`Airport`, `Geneva`, `Chamonix`, `a hotel`],
   timestart: timeStart(),
   timeend: timeStart() + duration(),
   price: Math.floor(Math.random() * 201),
@@ -71,7 +71,29 @@ export const DB = {
       timestart: timeStart(),
       timeend: timeStart() + duration(),
       price: `${Math.floor(Math.random() * 201)}`,
-      offers: POINT_VARIABLES.offers,
+      offers: {
+        'add-luggage': {
+          title: `Add luggage`,
+          isChecked: true,
+          price: 30,
+        },
+        'switch-to-comfort-class': {
+          title: `Switch to comfort class`,
+          isChecked: false,
+          price: 100,
+        },
+        'add-meal': {
+          title: `Add meal`,
+          isChecked: false,
+          price: 15,
+        },
+        'choose-seats': {
+          title: `Choose seats`,
+          isChecked: true,
+          price: 5,
+        },
+      },
+      isFavorite: true
     },
     {
       icon: `taxi`,
@@ -79,7 +101,29 @@ export const DB = {
       timestart: timeStart(),
       timeend: timeStart() + duration(),
       price: `${Math.floor(Math.random() * 201)}`,
-      offers: POINT_VARIABLES.offers,
+      offers: {
+        'add-luggage': {
+          title: `Add luggage`,
+          isChecked: true,
+          price: 30,
+        },
+        'switch-to-comfort-class': {
+          title: `Switch to comfort class`,
+          isChecked: true,
+          price: 100,
+        },
+        'add-meal': {
+          title: `Add meal`,
+          isChecked: false,
+          price: 15,
+        },
+        'choose-seats': {
+          title: `Choose seats`,
+          isChecked: true,
+          price: 5,
+        },
+      },
+      isFavorite: false
     },
     {
       icon:
