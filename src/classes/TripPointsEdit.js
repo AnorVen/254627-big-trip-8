@@ -48,8 +48,10 @@ export class TripPointEdit extends Component {
           },
           enableTime: true,
           dateFormat: `H:i`,
+          mode: `range`,
           time_24hr: true,
-          defaultDate: moment(this._timestart).format(`HH:MM YYYY MM DD `),
+          defaultDate: [moment(this._timestart).format(`HH:mm YYYY MM DD`),
+            moment(this._timeend).format(`HH:mm YYYY MM DD`)],
           minuteIncrement: 10,
           onClose: (dateObj) => {
             this._timestart = dateObj[0];
@@ -89,17 +91,6 @@ export class TripPointEdit extends Component {
   _partialUpdate() {
     this._element.innerHTML = this.template;
   }
-  _onSaveButtonClick(evt) {
-    evt.preventDefault();
-    const formData = new FormData(this._element.querySelector(`.tripPointForm`));
-    const newData = this._processForm(formData);
-    if (typeof this._onSubmit === `function`) {
-      this._onSubmit(newData);
-    }
-    this.update(newData);
-
-
-  }
 
   update(data) {
     this._id = data.id;
@@ -125,17 +116,16 @@ export class TripPointEdit extends Component {
     this._onSubmit = fn;
   }
 
-  static createMapper(target) {
-    return {
-      id: (value) => (target.id = value),
-      destination: (value) => (target.name = value),
-      time: (value) => (target.time = value),
-      price: (value) => (target.price = value),
-      icon: (value) => (target.icon = value),
-      offers: (value) => (target.offers = value),
-      favorite: (value) => (target.isFavorite = value),
 
-    };
+  _onSaveButtonClick(evt) {
+    evt.preventDefault();
+    const formData = new FormData(this._element.querySelector(`.tripPointForm`));
+    const newData = this._processForm(formData);
+    debugger
+    if (typeof this._onSubmit === `function`) {
+      this._onSubmit(newData);
+    }
+    this.update(newData);
   }
 
   _processForm(formData) {
@@ -143,8 +133,9 @@ export class TripPointEdit extends Component {
       id: ``,
       title: ``,
       icon: ``,
-      offers: {},
+      offers: this._offers,
       timestart: ``,
+      timeend: ``,
       price: 0,
       isFavorite: false,
     };
@@ -156,14 +147,28 @@ export class TripPointEdit extends Component {
         TripPointEditMapper[property](value);
       }
     }
-    debugger
+
     return entry;
+  }
+
+
+  static createMapper(target) {
+    return {
+      id: (value) => (target.id = value),
+      destination: (value) => (target.title = value),
+      timestart: (value) => (target.timestart = moment(value).unix() * 1000),
+      timeend: (value) => (target.timeend = moment(value).unix() * 1000),
+      price: (value) => (target.price = value),
+      iconText: (value) => (target.icon = value),
+      favorite: (value) => (target.isFavorite = value),
+      offer: (value) => (target.offers[value].isChecked = true)
+    };
   }
 
   get template() {
     return (` <article class="point">
-         <div><p>${moment(this._timestart).format(`DD MM HH:mm`)}</p>
-              <p>${moment(this._timeend).format(`DD MM HH:mm`)}</p></div>
+         <div><p>${moment(this._timestart).format(`DD MM YY HH:mm`)}</p>
+              <p>${moment(this._timeend).format(`DD MM YY HH:mm`)}</p></div>
     
           <form action="" method="get" class="tripPointForm">
             <header class="point__header">
@@ -174,6 +179,7 @@ export class TripPointEdit extends Component {
               </label>
 
               <div class="travel-way">
+              <input type="hidden" value="${this._icon}" name="iconText">
                 <label 
                   class="travel-way__label" 
                   for="travel-way__toggle-${this._id}">
@@ -185,6 +191,7 @@ export class TripPointEdit extends Component {
                   name="icon"
                   value="${this._icon}"
                   id="travel-way__toggle-${this._id}">
+                  
 
                 <div class="travel-way__select">
                   <div class="travel-way__select-group">
@@ -251,7 +258,9 @@ export class TripPointEdit extends Component {
 
               <div class="point__destination-wrap">
                 <label class="point__destination-label" for="destination">${this._icon} to</label>
-                <input class="point__destination-input" list="destination-select" id="destination" value="${this._title}" name="destination">
+                <input class="point__destination-input" list="destination-select"
+                 id="destination" value="${this._title}"
+                  name="destination">
                 <datalist id="destination-select">
                 ${this._journeyPoint.map((item)=>(`<option value="${item}"></option>`).trim()).join(``)}           
                 </datalist>
@@ -260,6 +269,8 @@ export class TripPointEdit extends Component {
               <label class="point__time">
                 choose time
                 <input class="point__input" type="text" value="00:00 — 00:00" name="time" placeholder="00:00 — 00:00">
+                <input type="hidden" name="timestart" value="${moment(this._timestart).format()}">
+                <input type="hidden" name="timeend" value="${moment(this._timeend).format()}">
               </label>
 
               <label class="point__price">
@@ -311,9 +322,16 @@ export class TripPointEdit extends Component {
     for (let item in obj) {
       if (Object.prototype.hasOwnProperty.call(obj, item)) {
         tempHTML += `
-        <input class="point__offers-input visually-hidden" type="checkbox" id="${item}-${this._id}" name="offer" value="choose-seats"${obj[item].isChecked && `checked`} >
-                  <label for="${item}-${this._id}" class="point__offers-label">
-                    <span class="point__offer-service">${obj[item].title}</span> + €<span class="point__offer-price">${obj[item].price || 0}</span>
+        <input class="point__offers-input visually-hidden" 
+          type="checkbox" 
+          id="${item}-${this._id}" 
+          name="offer" 
+          value="${item}" 
+          ${obj[item].isChecked ? `checked` : null} >
+        <label for="${item}-${this._id}" 
+          class="point__offers-label">
+         <span class="point__offer-service">${obj[item].title}</span> + €<span 
+          class="point__offer-price">${obj[item].price || 0}</span>
                   </label>`;
 
       }

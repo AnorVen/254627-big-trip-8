@@ -16,10 +16,11 @@ export class TripPoint extends Component {
 
     this._element = null;
     this._onEdit = null;
-    this.state = {
-      price: this._price,
-      offers: this._offers,
-    };
+    this._state.price = price;
+    this._state.offers = offers;
+
+    this.fullPrice = this.fullPrice.bind(this);
+    this.offersPrice = this.offersPrice.bind(this);
   }
   bind() {
     this._element.addEventListener(`click`, this._onEditButtonClick.bind(this));
@@ -43,10 +44,10 @@ export class TripPoint extends Component {
     this._title = data.title;
     this._timestart = data.timestart;
     this._timeend = data.timeend;
-    this._price = data.price;
     this._offers = data.offers;
-    this.state.offers = data.offers;
     this._isFavorite = data.isFavorite;
+    this._state.offers = data.offers;
+    this._state.price = data.price;
   }
 
 
@@ -66,7 +67,9 @@ export class TripPoint extends Component {
     let tempHTML = `<ul class="trip-point__offers">`;
     for (let item in obj) {
       if (Object.prototype.hasOwnProperty.call(obj, item)) {
-        tempHTML += `<li><button class="trip-point__offer">${obj[item].title} + €${obj[item].price}</button></li>`;
+        if (obj[item].isChecked){
+          tempHTML += `<li><button class="trip-point__offer">${obj[item].title} + €${obj[item].price}</button></li>`;
+        }
       }
     }
     tempHTML += `</ul>`;
@@ -74,7 +77,7 @@ export class TripPoint extends Component {
   }
 
 
-  get offersPrice() {
+  offersPrice() {
     if (this._state.offers) {
       return Object.keys(this._state.offers).reduce((acc, offer) => {
         if (this._state.offers[offer].isChecked) {
@@ -88,9 +91,10 @@ export class TripPoint extends Component {
 
   fullPrice() {
     if (this._state.offers) {
-      return parseInt(this._state.price, 10) + this.offersPrice;
+      return parseInt(this._state.price, 10) + this.offersPrice();
     }
-    return 0;
+    return this._state.price;
+
   }
 
   _timeSectionRender(timestart, timeend) {

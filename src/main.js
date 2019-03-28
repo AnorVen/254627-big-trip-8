@@ -22,22 +22,22 @@ function tasksRender(arr) {
 
 
 
-  let minTimeStart = moment(arr[0].timestart);
+  let minTimeStart = moment(arr[0].timestart).unix();
   for (let i = 0; i < 2; i++) {
     //проверка что старт точно раньше окончания
-    if(arr[i].timestart > arr[i].timeend){
+    if(moment(arr[i].timestart).unix() > moment(arr[i].timeend).unix()){
       [arr[i].timestart, arr[i].timeend] = [arr[i].timeend, arr[i].timestart]
     }
     //проверка что начало следующего таска не раньше конца предыдущего
     if( minTimeStart  > moment(arr[i].timestart) ){
-      let tempTime = arr[i].timeend - arr[i].timestart;
+      let tempTime = moment(arr[i].timeend).unix() - moment(arr[i].timestart).unix();
      arr[i].timestart = moment(minTimeStart);
      arr[i].timeend = moment(minTimeStart).add(tempTime,'ms');
     }
 
     let tripPoint = new TripPoint({id : i, ...arr[i]});
     let tripPointEdit = new TripPointEdit({id : i, ...arr[i]});
-    TripPointsList.appendChild(tripPointEdit.render());
+    TripPointsList.appendChild(tripPoint.render());
 
     tripPoint.onEdit = () => {
       tripPointEdit.render();
@@ -58,6 +58,7 @@ function tasksRender(arr) {
 
 
       tripPoint.update(point);
+      debugger
       tripPoint.render();
       TripPointsList.replaceChild(tripPoint.element, tripPointEdit.element);
       tripPointEdit.unrender();
