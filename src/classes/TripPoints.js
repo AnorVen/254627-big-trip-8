@@ -64,16 +64,19 @@ export class TripPoint extends Component {
   }
 
   _offerRender(obj) {
-    let tempHTML = `<ul class="trip-point__offers">`;
-    for (let item in obj) {
-      if (Object.prototype.hasOwnProperty.call(obj, item)) {
-        if (obj[item].isChecked){
-          tempHTML += `<li><button class="trip-point__offer">${obj[item].title} + €${obj[item].price}</button></li>`;
+    if (typeof obj === `object`) {
+      let tempHTML = `<ul class="trip-point__offers">`;
+      for (let item in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, item)) {
+          if (obj[item].isChecked) {
+            tempHTML += `<li><button class="trip-point__offer">${obj[item].title} + €${obj[item].price}</button></li>`;
+          }
         }
       }
+      tempHTML += `</ul>`;
+      return tempHTML;
     }
-    tempHTML += `</ul>`;
-    return tempHTML;
+    return ``;
   }
 
 
@@ -98,12 +101,12 @@ export class TripPoint extends Component {
   }
 
   _timeSectionRender(timestart, timeend) {
-    let timeStart = moment(timestart).format(`DD MM HH:mm`);
-    let timeEnd = moment(timeend).format(`DD MM HH:mm`);
+    let timeStart = moment(timestart).format(`HH:mm`);
+    let timeEnd = moment(timeend).format(`HH:mm`);
     let timeShift = moment.duration(moment(timeend).diff(moment(timestart))).format(`hh[h]: mm[m]`);
 
 
-    return `<span class="trip-point__timetable">${timeStart}&nbsp;&mdash; ${timeEnd}</span>
+    return `<span class="trip-point__timetable">${timeStart} &nbsp;&mdash; ${timeEnd}</span>
             <span class="trip-point__duration">${timeShift}</span>`;
   }
 }

@@ -15,8 +15,9 @@ export class TripPointEdit extends Component {
     this._offers = offers;
     this._element = null;
     this._isFavorite = isFavorite;
-
+    this._state.offers = offers;
     this._journeyPoint = POINT_VARIABLES.title;
+    this._onChangeOffers = this._onChangeOffers.bind(this);
   }
   bind() {
     this._element.querySelector(`form`)
@@ -27,6 +28,8 @@ export class TripPointEdit extends Component {
       .addEventListener(`click`, this.onIconChange.bind(this));
     this._element.querySelector(`.point__destination-input`)
       .addEventListener(`change`, this.onTitleChange.bind(this));
+    this._element.querySelector(`.point__offers-wrap`)
+      .addEventListener(`change`, this._onChangeOffers);
     // Date Input
     flatpickr(
         this._element.querySelector(`.point__date .point__input`),
@@ -34,9 +37,6 @@ export class TripPointEdit extends Component {
           dateFormat: `m d`,
           mode: `range`,
           defaultDate: moment(this._timestart).format(`MM DD`),
-          onChange: (dateObj) => {
-            console.log(dateObj);
-          }
         });
 
     // Time Range
@@ -70,6 +70,11 @@ export class TripPointEdit extends Component {
     this._element.querySelector(`.travel-way__select`)
       .removeEventListener(`click`, this.onIconChange.bind(this));
 
+  }
+
+  _onChangeOffers(e) {
+    e.preventDefault();
+    this._state.offers[e.target.value].isChecked = e.target.checked;
   }
 
   onTitleChange(e) {
@@ -121,7 +126,6 @@ export class TripPointEdit extends Component {
     evt.preventDefault();
     const formData = new FormData(this._element.querySelector(`.tripPointForm`));
     const newData = this._processForm(formData);
-    debugger
     if (typeof this._onSubmit === `function`) {
       this._onSubmit(newData);
     }
@@ -133,7 +137,7 @@ export class TripPointEdit extends Component {
       id: ``,
       title: ``,
       icon: ``,
-      offers: this._offers,
+      offers: this._state.offers,
       timestart: ``,
       timeend: ``,
       price: 0,
@@ -167,9 +171,7 @@ export class TripPointEdit extends Component {
 
   get template() {
     return (` <article class="point">
-         <div><p>${moment(this._timestart).format(`DD MM YY HH:mm`)}</p>
-              <p>${moment(this._timeend).format(`DD MM YY HH:mm`)}</p></div>
-    
+         <div>    
           <form action="" method="get" class="tripPointForm">
             <header class="point__header">
               <input type="hidden" class="visually-hidden" name="id" value="${this._id}">
@@ -318,24 +320,27 @@ export class TripPointEdit extends Component {
 
 
   _offerRender(obj) {
-    let tempHTML = ``;
-    for (let item in obj) {
-      if (Object.prototype.hasOwnProperty.call(obj, item)) {
-        tempHTML += `
+    if (typeof obj === `object`) {
+      let tempHTML = ``;
+      for (let item in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, item)) {
+          tempHTML += `
         <input class="point__offers-input visually-hidden" 
           type="checkbox" 
           id="${item}-${this._id}" 
           name="offer" 
           value="${item}" 
-          ${obj[item].isChecked ? `checked` : null} >
+          ${obj[item].isChecked && `checked`} >
         <label for="${item}-${this._id}" 
           class="point__offers-label">
          <span class="point__offer-service">${obj[item].title}</span> + €<span 
           class="point__offer-price">${obj[item].price || 0}</span>
                   </label>`;
 
+        }
       }
+      return tempHTML;
     }
-    return tempHTML;
+    return ``;
   }
 }
