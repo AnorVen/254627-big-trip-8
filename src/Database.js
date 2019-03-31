@@ -20,9 +20,10 @@ export const POINT_VARIABLES = {
     sightseeing: `🏛️`,
     restaurant: `🍴`,
   },
+  iconText: [`taxi`, `bus`, `train`, `ship`, `transport`, `drive`, `flight`, `checkin`, `sightseeing`, `sightseeing`],
   title: [`Airport`, `Geneva`, `Chamonix`, `a hotel`],
-  timestart: timeStart(),
-  timeend: timeStart() + duration(),
+  timeStart: timeStart(),
+  timeEnd: timeStart() + duration(),
   price: Math.floor(Math.random() * 201),
   offers: {
     'add-luggage': {
@@ -68,8 +69,8 @@ export const DB = {
     {
       icon: `bus`,
       title: POINT_VARIABLES.title[1],
-      timestart: timeStart(),
-      timeend: timeStart() + duration(),
+      timeStart: timeStart(),
+      timeEnd: timeStart() + duration(),
       price: `${Math.floor(Math.random() * 201)}`,
       offers: {
         'add-luggage': {
@@ -98,8 +99,8 @@ export const DB = {
     {
       icon: `taxi`,
       title: POINT_VARIABLES.title[0],
-      timestart: timeStart(),
-      timeend: timeStart() + duration(),
+      timeStart: timeStart(),
+      timeEnd: timeStart() + duration(),
       price: `${Math.floor(Math.random() * 201)}`,
       offers: {
         'add-luggage': {
@@ -131,8 +132,8 @@ export const DB = {
           Object.keys(POINT_VARIABLES.icon)[
             Math.floor(Math.random() * Object.keys(POINT_VARIABLES.icon).length)]],
       title: POINT_VARIABLES.title[Math.floor(Math.random() * POINT_VARIABLES.title.length)],
-      timestart: timeStart(),
-      timeend: timeStart() + duration(),
+      timeStart: timeStart(),
+      timeEnd: timeStart() + duration(),
       price: `${Math.floor(Math.random() * 201)}`,
       offers: POINT_VARIABLES.offers,
     },
@@ -142,7 +143,7 @@ export const DB = {
           Object.keys(POINT_VARIABLES.icon)[
             Math.floor(Math.random() * Object.keys(POINT_VARIABLES.icon).length)]],
       title: POINT_VARIABLES.title[Math.floor(Math.random() * POINT_VARIABLES.title.length)],
-      timestart: timeStart(),
+      timeStart: timeStart(),
       duration: moment(Math.round(Math.random() * 60 * 60 * 24 * 1000)).format(`X`),
       price: `${Math.floor(Math.random() * 201)}`,
       offers: POINT_VARIABLES.offers,
@@ -153,8 +154,8 @@ export const DB = {
           Object.keys(POINT_VARIABLES.icon)[
             Math.floor(Math.random() * Object.keys(POINT_VARIABLES.icon).length)]],
       title: POINT_VARIABLES.title[Math.floor(Math.random() * POINT_VARIABLES.title.length)],
-      timestart: timeStart(),
-      timeend: timeStart() + duration(),
+      timeStart: timeStart(),
+      timeEnd: timeStart() + duration(),
       price: `${Math.floor(Math.random() * 201)}`,
       offers: POINT_VARIABLES.offers,
     },
@@ -164,8 +165,8 @@ export const DB = {
           Object.keys(POINT_VARIABLES.icon)[
             Math.floor(Math.random() * Object.keys(POINT_VARIABLES.icon).length)]],
       title: POINT_VARIABLES.title[Math.floor(Math.random() * POINT_VARIABLES.title.length)],
-      timestart: timeStart(),
-      timeend: timeStart() + duration(),
+      timeStart: timeStart(),
+      timeEnd: timeStart() + duration(),
       price: `${Math.floor(Math.random() * 201)}`,
       offers: POINT_VARIABLES.offers,
     },
@@ -175,8 +176,8 @@ export const DB = {
           Object.keys(POINT_VARIABLES.icon)[
             Math.floor(Math.random() * Object.keys(POINT_VARIABLES.icon).length)]],
       title: POINT_VARIABLES.title[Math.floor(Math.random() * POINT_VARIABLES.title.length)],
-      timestart: timeStart(),
-      timeend: timeStart() + duration(),
+      timeStart: timeStart(),
+      timeEnd: timeStart() + duration(),
       price: `${Math.floor(Math.random() * 201)}`,
       offers: POINT_VARIABLES.offers,
     },

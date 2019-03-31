@@ -4,13 +4,13 @@ import flatpickr from 'flatpickr';
 import {POINT_VARIABLES} from '../Database';
 
 export class TripPointEdit extends Component {
-  constructor({id, icon, title, timestart, timeend, price, offers, isFavorite}) {
+  constructor({id, icon, title, timeStart, timeEnd, price, offers, isFavorite}) {
     super();
     this._id = id;
     this._icon = icon;
     this._title = title;
-    this._timestart = timestart;
-    this._timeend = timeend;
+    this._timeStart = timeStart;
+    this._timeEnd = timeEnd;
     this._price = price;
     this._offers = offers;
     this._element = null;
@@ -36,7 +36,7 @@ export class TripPointEdit extends Component {
         {
           dateFormat: `m d`,
           mode: `range`,
-          defaultDate: moment(this._timestart).format(`MM DD`),
+          defaultDate: moment(this._timeStart).format(`MM DD`),
         });
 
     // Time Range
@@ -50,12 +50,12 @@ export class TripPointEdit extends Component {
           dateFormat: `H:i`,
           mode: `range`,
           time_24hr: true,
-          defaultDate: [moment(this._timestart).format(`HH:mm YYYY MM DD`),
-            moment(this._timeend).format(`HH:mm YYYY MM DD`)],
+          defaultDate: [moment(this._timeStart).format(`HH:mm YYYY MM DD`),
+            moment(this._timeEnd).format(`HH:mm YYYY MM DD`)],
           minuteIncrement: 10,
           onClose: (dateObj) => {
-            this._timestart = dateObj[0];
-            this._timeend = dateObj[1];
+            this._timeStart = dateObj[0];
+            this._timeEnd = dateObj[1];
             this.reRender();
           }
         });
@@ -72,18 +72,18 @@ export class TripPointEdit extends Component {
 
   }
 
-  _onChangeOffers(e) {
-    e.preventDefault();
-    this._state.offers[e.target.value].isChecked = e.target.checked;
+  _onChangeOffers(evt) {
+    evt.preventDefault();
+    this._state.offers[evt.target.value].isChecked = evt.target.checked;
   }
 
-  onTitleChange(e) {
-    this._title = e.target.value;
+  onTitleChange(evt) {
+    this._title = evt.target.value;
     this.reRender();
   }
-  onIconChange(e) {
-    if (e.target.tagName === `INPUT`) {
-      this._icon = e.target.value;
+  onIconChange(evt) {
+    if (evt.target.tagName === `INPUT`) {
+      this._icon = evt.target.value;
       this.reRender();
     }
   }
@@ -101,8 +101,8 @@ export class TripPointEdit extends Component {
     this._id = data.id;
     this._icon = data.icon;
     this._title = data.title;
-    this._timestart = data.timestart;
-    this._timeend = data.timeend;
+    this._timeStart = data.timeStart;
+    this._timeEnd = data.timeEnd;
     this._price = data.price;
     this._offers = data.offers;
     this._timeShift = data.timeShift;
@@ -138,8 +138,8 @@ export class TripPointEdit extends Component {
       title: ``,
       icon: ``,
       offers: this._state.offers,
-      timestart: ``,
-      timeend: ``,
+      timeStart: ``,
+      timeEnd: ``,
       price: 0,
       isFavorite: false,
     };
@@ -160,8 +160,8 @@ export class TripPointEdit extends Component {
     return {
       id: (value) => (target.id = value),
       destination: (value) => (target.title = value),
-      timestart: (value) => (target.timestart = moment(value).unix() * 1000),
-      timeend: (value) => (target.timeend = moment(value).unix() * 1000),
+      timeStart: (value) => (target.timeStart = moment(value).unix() * 1000),
+      timeEnd: (value) => (target.timeEnd = moment(value).unix() * 1000),
       price: (value) => (target.price = value),
       iconText: (value) => (target.icon = value),
       favorite: (value) => (target.isFavorite = value),
@@ -271,8 +271,8 @@ export class TripPointEdit extends Component {
               <label class="point__time">
                 choose time
                 <input class="point__input" type="text" value="00:00 — 00:00" name="time" placeholder="00:00 — 00:00">
-                <input type="hidden" name="timestart" value="${moment(this._timestart).format()}">
-                <input type="hidden" name="timeend" value="${moment(this._timeend).format()}">
+                <input type="hidden" name="timeStart" value="${moment(this._timeStart).format()}">
+                <input type="hidden" name="timeEnd" value="${moment(this._timeEnd).format()}">
               </label>
 
               <label class="point__price">

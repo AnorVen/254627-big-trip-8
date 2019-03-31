@@ -22,17 +22,17 @@ function tasksRender(arr) {
 
 
 
-  let minTimeStart = moment(arr[0].timestart).unix();
+  let minTimeStart = moment(arr[0].timeStart).unix();
   for (let i = 0; i < 2; i++) {
     //проверка что старт точно раньше окончания
-    if(moment(arr[i].timestart).unix() > moment(arr[i].timeend).unix()){
-      [arr[i].timestart, arr[i].timeend] = [arr[i].timeend, arr[i].timestart]
+    if(moment(arr[i].timeStart).unix() > moment(arr[i].timeEnd).unix()){
+      [arr[i].timeStart, arr[i].timeEnd] = [arr[i].timeEnd, arr[i].timeStart]
     }
     //проверка что начало следующего таска не раньше конца предыдущего
-    if( minTimeStart  > moment(arr[i].timestart) ){
-      let tempTime = moment(arr[i].timeend).unix() - moment(arr[i].timestart).unix();
-     arr[i].timestart = moment(minTimeStart);
-     arr[i].timeend = moment(minTimeStart).add(tempTime,'ms');
+    if( minTimeStart  > moment(arr[i].timeStart) ){
+      let tempTime = moment(arr[i].timeEnd).unix() - moment(arr[i].timeStart).unix();
+     arr[i].timeStart = moment(minTimeStart);
+     arr[i].timeEnd = moment(minTimeStart).add(tempTime,'ms');
     }
 
     let tripPoint = new TripPoint({id : i, ...arr[i]});
@@ -50,8 +50,8 @@ function tasksRender(arr) {
       point.id = newObject.id;
       point.icon = newObject.icon;
       point.title = newObject.title;
-      point.timestart = newObject.timestart;
-      point.timeend = newObject.timeend;
+      point.timeStart = newObject.timeStart;
+      point.timeEnd = newObject.timeEnd;
       point.price = newObject.price;
       point.offers = newObject.offers;
       point.isFavorite = newObject.isFavorite;
@@ -63,7 +63,7 @@ function tasksRender(arr) {
       TripPointsList.replaceChild(tripPoint.element, tripPointEdit.element);
       tripPointEdit.unrender();
     };
-    minTimeStart = moment(arr[i].timeend);
+    minTimeStart = moment(arr[i].timeEnd);
   }
 }
 
@@ -71,17 +71,19 @@ function randomPoint({icon}) {
   TripPointsList.innerHTML = ``;
   for (let i = 0; i < Math.floor(Math.random() * 20); i++) {
     let tripPoint = new TripPoint({
-      icon: icon[Object.keys(icon)[Math.floor(Math.random() * Object.keys(icon).length)]],
+      id: i,
+      icon: POINT_VARIABLES.iconText[Math.floor(Math.random() * POINT_VARIABLES.iconText.length)],
       title: POINT_VARIABLES.title[Math.floor(Math.random() * POINT_VARIABLES.title.length)],
-      timestart: Date.now() + Math.round(Math.random() * 2010000),
+      timeStart: Date.now() + Math.round(Math.random() * 2010000),
       duration: Math.round(Math.random() * 60 * 60 * 24 * 1000),
       price: Math.floor(Math.random() * 201),
       offers: [Math.floor(Math.random() * 201), Math.floor(Math.random() * 201)],
     });
     let tripPointEdit = new TripPointEdit({
-      icon: icon[Object.keys(icon)[Math.floor(Math.random() * Object.keys(icon).length)]],
+      id: i,
+      icon: POINT_VARIABLES.iconText[Math.floor(Math.random() * POINT_VARIABLES.iconText.length)],
       title: POINT_VARIABLES.title[Math.floor(Math.random() * POINT_VARIABLES.title.length)],
-      timestart: Date.now() + Math.round(Math.random() * 2010000),
+      timeStart: Date.now() + Math.round(Math.random() * 2010000),
       duration: Math.round(Math.random() * 60 * 60 * 24 * 1000),
       price: Math.floor(Math.random() * 201),
       offers: [Math.floor(Math.random() * 201), Math.floor(Math.random() * 201)],
