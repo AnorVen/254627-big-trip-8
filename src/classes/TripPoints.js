@@ -1,4 +1,5 @@
 import moment from 'moment';
+// eslint-disable-next-line
 import momentDurationFormatSetup from 'moment-duration-format'; // без этого не запускается плагин для момента
 import Component from './Component';
 import {POINT_VARIABLES} from '../Database';

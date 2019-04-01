@@ -49,6 +49,7 @@ export class TripPointEdit extends Component {
           enableTime: true,
           dateFormat: `H:i`,
           mode: `range`,
+          // eslint-disable-next-line
           time_24hr: true,
           defaultDate: [moment(this._timeStart).format(`HH:mm YYYY MM DD`),
             moment(this._timeEnd).format(`HH:mm YYYY MM DD`)],

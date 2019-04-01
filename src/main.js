@@ -35,6 +35,7 @@ function tasksRender(arr) {
      arr[i].timeEnd = moment(minTimeStart).add(tempTime,'ms');
     }
 
+// eslint-disable-next-line
     let tripPoint = new TripPoint({id : i, ...arr[i]});
     let tripPointEdit = new TripPointEdit({id : i, ...arr[i]});
     TripPointsList.appendChild(tripPoint.render());
