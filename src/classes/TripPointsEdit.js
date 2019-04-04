@@ -18,6 +18,7 @@ export class TripPointEdit extends Component {
     this._state.offers = offers;
     this._journeyPoint = POINT_VARIABLES.title;
     this._onChangeOffers = this._onChangeOffers.bind(this);
+    this._onDelete = null;
   }
   bind() {
     this._element.querySelector(`form`)
@@ -60,6 +61,16 @@ export class TripPointEdit extends Component {
             this.reRender();
           }
         });
+  }
+
+  set onDelete(fn) {
+    this._onDelete = fn;
+  }
+
+  _onResetButtonClick() {
+    if (typeof this._onDelete === `function`) {
+      this._onDelete();
+    }
   }
 
 
@@ -112,12 +123,7 @@ export class TripPointEdit extends Component {
   }
 
 
-  _onResetButtonClick(evt) {
-    evt.preventDefault();
-    if (typeof this._onSubmit === `function`) {
-      this._onSubmit();
-    }
-  }
+
   set onSubmit(fn) {
     this._onSubmit = fn;
   }

@@ -1,5 +1,3 @@
-import {createElement} from '../createElement';
-
 export default class Component {
   constructor() {
     if (new.target === Component) {
@@ -28,9 +26,14 @@ export default class Component {
     this._state = newState;
   }
 
+  createElement(template) {
+    const newElement = document.createElement(`div`);
+    newElement.innerHTML = template;
+    return newElement.firstChild;
+  };
 
   render() {
-    this._element = createElement(this.template);
+    this._element = this.createElement(this.template);
     this.bind();
     return this._element;
   }
