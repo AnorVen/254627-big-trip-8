@@ -127,10 +127,7 @@ export const DB = {
       isFavorite: false
     },
     {
-      icon:
-        POINT_VARIABLES.icon[
-          Object.keys(POINT_VARIABLES.icon)[
-            Math.floor(Math.random() * Object.keys(POINT_VARIABLES.icon).length)]],
+      icon: `drive`,
       title: POINT_VARIABLES.title[Math.floor(Math.random() * POINT_VARIABLES.title.length)],
       timeStart: timeStart(),
       timeEnd: timeStart() + duration(),
@@ -138,10 +135,7 @@ export const DB = {
       offers: POINT_VARIABLES.offers,
     },
     {
-      icon:
-        POINT_VARIABLES.icon[
-          Object.keys(POINT_VARIABLES.icon)[
-            Math.floor(Math.random() * Object.keys(POINT_VARIABLES.icon).length)]],
+      icon: `restaurant`,
       title: POINT_VARIABLES.title[Math.floor(Math.random() * POINT_VARIABLES.title.length)],
       timeStart: timeStart(),
       duration: moment(Math.round(Math.random() * 60 * 60 * 24 * 1000)).format(`X`),
@@ -149,10 +143,7 @@ export const DB = {
       offers: POINT_VARIABLES.offers,
     },
     {
-      icon:
-        POINT_VARIABLES.icon[
-          Object.keys(POINT_VARIABLES.icon)[
-            Math.floor(Math.random() * Object.keys(POINT_VARIABLES.icon).length)]],
+      icon: `checkin`,
       title: POINT_VARIABLES.title[Math.floor(Math.random() * POINT_VARIABLES.title.length)],
       timeStart: timeStart(),
       timeEnd: timeStart() + duration(),
@@ -160,10 +151,7 @@ export const DB = {
       offers: POINT_VARIABLES.offers,
     },
     {
-      icon:
-        POINT_VARIABLES.icon[
-          Object.keys(POINT_VARIABLES.icon)[
-            Math.floor(Math.random() * Object.keys(POINT_VARIABLES.icon).length)]],
+      icon: `drive`,
       title: POINT_VARIABLES.title[Math.floor(Math.random() * POINT_VARIABLES.title.length)],
       timeStart: timeStart(),
       timeEnd: timeStart() + duration(),
@@ -171,10 +159,7 @@ export const DB = {
       offers: POINT_VARIABLES.offers,
     },
     {
-      icon:
-        POINT_VARIABLES.icon[
-          Object.keys(POINT_VARIABLES.icon)[
-            Math.floor(Math.random() * Object.keys(POINT_VARIABLES.icon).length)]],
+      icon: `ship`,
       title: POINT_VARIABLES.title[Math.floor(Math.random() * POINT_VARIABLES.title.length)],
       timeStart: timeStart(),
       timeEnd: timeStart() + duration(),
