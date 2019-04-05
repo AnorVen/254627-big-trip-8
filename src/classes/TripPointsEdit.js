@@ -122,8 +122,6 @@ export class TripPointEdit extends Component {
 
   }
 
-
-
   set onSubmit(fn) {
     this._onSubmit = fn;
   }

@@ -151,7 +151,7 @@ export const DB = {
       offers: POINT_VARIABLES.offers,
     },
     {
-      icon: `sightseeing`,
+      icon: `drive`,
       title: POINT_VARIABLES.title[Math.floor(Math.random() * POINT_VARIABLES.title.length)],
       timeStart: timeStart(),
       timeEnd: timeStart() + duration(),

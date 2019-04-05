@@ -1,48 +1,72 @@
 import Chart from 'chart.js';
-import moment from 'moment';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import flatpickr from 'flatpickr';
+import {POINT_VARIABLES} from './Database';
+
+function offersPrice(point) {
+  let offersPirice = 0;
+  let arr = Object.keys(point.offers);
+  for (let i = 0; i < arr.length; i++) {
+
+
+    if (point.offers[arr[i]].isChecked) {
+      offersPirice += point.offers[arr[i]].price;
+    }
+  }
+  return offersPirice;
+
+}
 
 export function chartConteiner(points) {
+  document.querySelector(`.statistic__item--money`)
+    .innerHTML = `<canvas class="statistic__money" width="900"></canvas>`;
+  document.querySelector(`.statistic__item--transport`)
+    .innerHTML = `<canvas class="statistic__transport" width="900"></canvas>`;
+  document.querySelector(`.statistic__item--time-spend`)
+    .innerHTML = `<canvas class="statistic__time-spend" width="900"></canvas>`;
 
   const moneyCtx = document.querySelector(`.statistic__money`);
   const transportCtx = document.querySelector(`.statistic__transport`);
   const timeSpendCtx = document.querySelector(`.statistic__time-spend`);
 
-
   let tempDataIcon = {};
-  let labelColor = [];
-  let dataColor = [];
-  let backgroundColorColor = [];
-console.log(points)
+  let labelPoint = [];
+  let pricePoint = [];
+  let quantityIcon = [];
   for (let i = 0; i < points.length; i++) {
-    let temp = points[i];
-    if (tempDataIcon[temp].icon) {
-      tempDataIcon[temp].icon.price += temp.price;
+    let temp = points[i].icon;
+    if (tempDataIcon[temp]) {
+      tempDataIcon[temp].quantity += 1;
+      tempDataIcon[temp].price += +points[i].price + +offersPrice(points[i]);
     } else {
-      tempDataIcon[temp].icon.price = temp.price;
+      tempDataIcon[temp] = {};
+      tempDataIcon[temp].icon =
+        `${POINT_VARIABLES.icon[points[i].icon]} ${points[i].icon.toUpperCase()}`;
+      tempDataIcon[temp].price = +points[i].price + +offersPrice(points[i]);
+      tempDataIcon[temp].quantity = 1;
     }
   }
-  console.log(tempDataIcon)
-  for (let key in  tempDataIcon){
-    labelColor.push(`#${key}`);
-    dataColor.push(tempDataColor[key]);
-    backgroundColorColor.push(colorForChart[key]);
+
+  for (let key in tempDataIcon) {
+    if (Object.prototype.hasOwnProperty.call(tempDataIcon, key)) {
+      labelPoint.push(tempDataIcon[key].icon);
+      pricePoint.push(tempDataIcon[key].price);
+      quantityIcon.push(tempDataIcon[key].quantity);
+    }
   }
 
-// Рассчитаем высоту канваса в зависимости от того, сколько данных в него будет передаваться
+  // Рассчитаем высоту канваса в зависимости от того, сколько данных в него будет передаваться
   const BAR_HEIGHT = 55;
-  moneyCtx.height = BAR_HEIGHT * 6;
-  transportCtx.height = BAR_HEIGHT * 4;
-  timeSpendCtx.height = BAR_HEIGHT * 4;
+  moneyCtx.height = BAR_HEIGHT * points.length;
+  transportCtx.height = BAR_HEIGHT * points.length;
+  timeSpendCtx.height = BAR_HEIGHT * points.length;
 
   const moneyChart = new Chart(moneyCtx, {
     plugins: [ChartDataLabels],
     type: `horizontalBar`,
     data: {
-      labels: [`✈️FLY`, `🏨 STAY`, `🚗 DRIVE`, `🏛️ LOOK`, `🏨 EAT`, `🚕 RIDE`],
+      labels: labelPoint,
       datasets: [{
-        data: [400, 300, 200, 160, 150, 100],
+        data: pricePoint,
         backgroundColor: `#ffffff`,
         hoverBackgroundColor: `#ffffff`,
         anchor: `start`
@@ -55,8 +79,8 @@ console.log(points)
             size: 13
           },
           color: `#000000`,
-          anchor: 'end',
-          align: 'start',
+          anchor: `end`,
+          align: `start`,
           formatter: (val) => `€ ${val}`
         }
       },
@@ -105,9 +129,9 @@ console.log(points)
     plugins: [ChartDataLabels],
     type: `horizontalBar`,
     data: {
-      labels: [`🚗 DRIVE`, `🚕 RIDE`, `✈️ FLY`, `🛳️ SAIL`],
+      labels: labelPoint,
       datasets: [{
-        data: [4, 3, 2, 1],
+        data: quantityIcon,
         backgroundColor: `#ffffff`,
         hoverBackgroundColor: `#ffffff`,
         anchor: `start`
@@ -120,8 +144,8 @@ console.log(points)
             size: 13
           },
           color: `#000000`,
-          anchor: 'end',
-          align: 'start',
+          anchor: `end`,
+          align: `start`,
           formatter: (val) => `${val}x`
         }
       },
@@ -165,6 +189,6 @@ console.log(points)
       }
     }
   });
-
+  return [moneyChart, transportChart];
 
 }

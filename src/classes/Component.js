@@ -30,7 +30,7 @@ export default class Component {
     const newElement = document.createElement(`div`);
     newElement.innerHTML = template;
     return newElement.firstChild;
-  };
+  }
 
   render() {
     this._element = this.createElement(this.template);
