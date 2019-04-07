@@ -7,8 +7,8 @@ export class TripPoint extends Component {
   constructor({id, type, offers = [], date_from, date_to, base_price, is_favorite, destination}) {
     super();
     this._id = id;
-    this._icon = type;
-    this._title = destination.name;
+    this._icon = type || `bus`;
+    this._title = destination.name || `bus`;
     this._timeStart = date_from;
     this._timeEnd = date_to;
     this._price = base_price;
@@ -30,13 +30,23 @@ export class TripPoint extends Component {
     this._element.removeEventListener(`click`, this._onEditButtonClick.bind(this));
   }
 
-  static parseTask(data) {
-    return new TripPoint(data);
+
+  toRAW() {
+    return {
+      'id': this.id,
+      'title': this.title,
+      'due_date': this.dueDate,
+      'tags': [...this.tags.values()],
+      'picture': this.picture,
+      'repeating_days': this.repeatingDays,
+      'color': this.color,
+      'is_favorite': this.isFavorite,
+      'is_done': this.isDone,
+    }
   }
 
-  static parseTasks(data) {
-    return data.map(TripPoint.parseTask);
-  }
+
+
 
   _onEditButtonClick() {
     if (typeof this._onEdit === `function`) {

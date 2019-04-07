@@ -1,3 +1,4 @@
+import ModelPoint from './classes/ModelPoint';
 const Method = {
   GET: `GET`,
   POST: `POST`,
@@ -6,7 +7,6 @@ const Method = {
 };
 
 const checkStatus = (response) => {
-  console.log(response.json())
   if (response.status >= 200 && response.status < 300) {
     return response;
   } else {
@@ -26,17 +26,19 @@ export const API = class {
 
   getTasks() {
     return this._load({url: `points`})
-      .then(toJSON);
+      .then(toJSON)
+      .then(ModelPoint.parseTasks);
   }
 
-  createTask({task}) {
+  createTask({point}) {
     return this._load({
       url: `points`,
       method: Method.POST,
-      body: JSON.stringify(task),
+      body: JSON.stringify(point),
       headers: new Headers({'Content-Type': `application/json`})
     })
-      .then(toJSON);
+      .then(toJSON)
+      .then(ModelPoint.parseTask);
   }
 
   updateTask({id, data}) {
@@ -46,7 +48,8 @@ export const API = class {
       body: JSON.stringify(data),
       headers: new Headers({'Content-Type': `application/json`})
     })
-      .then(toJSON);
+      .then(toJSON)
+      .then(ModelPoint.parseTask);
   }
 
   deleteTask({id}) {
