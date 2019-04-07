@@ -1,9 +1,10 @@
+import moment from 'moment'
 import {TripPoint} from './classes/TripPoints';
 import {TripPointEdit} from './classes/TripPointsEdit';
 import {Filters} from './classes/Filters';
 import {DB} from './Database';
 import {chartConteiner} from './statistic'
-import moment from 'moment'
+import {API} from './api'
 
 let initialTasks = DB.POINTS_DATA;
 
@@ -11,6 +12,24 @@ const MainFilter = document.querySelector(`.trip-filter`);
 const TripPointsList = document.querySelector(`.trip-day__items`);
 const Statistic = document.querySelector(`a[href="#stats"]`);
 const Table = document.querySelector(`a[href="#table"]`);
+
+const AUTHORIZATION = `Basic dXNlckBwYXNzd29yZAo=${Math.random()}`;
+const END_POINT = `https://es8-demo-srv.appspot.com/big-trip`;
+
+const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
+
+/*
+api.getTasks()
+  .then((tasks) => {
+    tasksRender(tasks);
+  });
+*/
+
+
+
+
+
+
 
 Statistic.addEventListener('click', statisticClickHandler);
 Table.addEventListener('click', tableClickHandler);
@@ -78,51 +97,38 @@ const updateTask = (tasks, i, newTask) => {
 };
 
 function tasksRender(arr) {
-  if (arr.length){
-  let minTimeStart = moment(arr[0].timeStart).unix();
-  for (let i = 0; i < arr.length; i++) {
-    //проверка что старт точно раньше окончания
-    if(moment(arr[i].timeStart).unix() > moment(arr[i].timeEnd).unix()){
-      [arr[i].timeStart, arr[i].timeEnd] = [arr[i].timeEnd, arr[i].timeStart]
+  if (arr.length) {
+    for (let i = 0; i < arr.length; i++) {
+      // eslint-disable-next-line
+      let tripPoint = new TripPoint(arr[i]);
+      let tripPointEdit = new TripPointEdit(arr[i]);
+      TripPointsList.appendChild(tripPoint.render());
+
+      tripPoint.onEdit = () => {
+        tripPointEdit.render();
+        TripPointsList.replaceChild(tripPointEdit.element, tripPoint.element);
+        tripPoint.unrender();
+      };
+
+      tripPointEdit.onSubmit = (newObject) => {
+        const updatedTask = updateTask(arr, i, newObject);
+        tripPoint.update(updatedTask);
+        tripPoint.render();
+        TripPointsList.replaceChild(tripPoint.element, tripPointEdit.element);
+        tripPointEdit.unrender();
+        arr[i] = updatedTask;
+      };
+
+      tripPointEdit.onDelete = () => {
+        deleteTask(arr, i);
+        TripPointsList.removeChild(tripPointEdit.element);
+        tripPointEdit.unrender();
+      };
     }
-    //проверка что начало следующего таска не раньше конца предыдущего
-    if( minTimeStart  > moment(arr[i].timeStart) ){
-      let tempTime = moment(arr[i].timeEnd).unix() - moment(arr[i].timeStart).unix();
-     arr[i].timeStart = moment(minTimeStart);
-     arr[i].timeEnd = moment(minTimeStart).add(tempTime,'ms');
-    }
-
-// eslint-disable-next-line
-    let tripPoint = new TripPoint({id : i, ...arr[i]});
-    let tripPointEdit = new TripPointEdit({id : i, ...arr[i]});
-    TripPointsList.appendChild(tripPoint.render());
-
-    tripPoint.onEdit = () => {
-      tripPointEdit.render();
-      TripPointsList.replaceChild(tripPointEdit.element, tripPoint.element);
-      tripPoint.unrender();
-    };
-
-    tripPointEdit.onSubmit = (newObject) => {
-      const updatedTask = updateTask(arr, i, newObject);
-      tripPoint.update(updatedTask);
-      tripPoint.render();
-      TripPointsList.replaceChild(tripPoint.element, tripPointEdit.element);
-      tripPointEdit.unrender();
-      arr[i] = updatedTask;
-    };
-
-    tripPointEdit.onDelete = () => {
-      deleteTask(arr, i);
-      TripPointsList.removeChild(tripPointEdit.element);
-      tripPointEdit.unrender();
-    };
-    minTimeStart = moment(arr[i].timeEnd);
-  }
   }
 }
 
 window.onload = function () {
   filtersRender(DB.FILTERS_DATA);
-  tasksRender(initialTasks);
+ tasksRender(initialTasks);
 };

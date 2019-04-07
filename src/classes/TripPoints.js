@@ -4,20 +4,20 @@ import momentDurationFormatSetup from 'moment-duration-format'; // без это
 import Component from './Component';
 import {POINT_VARIABLES} from '../Database';
 export class TripPoint extends Component {
-  constructor({id, icon, title, timeStart, timeEnd, price, offers, isFavorite}) {
+  constructor({id, type, offers = [], date_from, date_to, base_price, is_favorite, destination}) {
     super();
     this._id = id;
-    this._icon = icon;
-    this._title = title;
-    this._timeStart = timeStart;
-    this._timeEnd = timeEnd;
-    this._price = price;
+    this._icon = type;
+    this._title = destination.name;
+    this._timeStart = date_from;
+    this._timeEnd = date_to;
+    this._price = base_price;
     this._offers = offers;
-    this._isFavorite = isFavorite;
+    this._isFavorite = Boolean(is_favorite);
 
     this._element = null;
     this._onEdit = null;
-    this._state.price = price;
+    this._state.price = base_price;
     this._state.offers = offers;
 
     this.fullPrice = this.fullPrice.bind(this);
@@ -28,6 +28,14 @@ export class TripPoint extends Component {
   }
   unbind() {
     this._element.removeEventListener(`click`, this._onEditButtonClick.bind(this));
+  }
+
+  static parseTask(data) {
+    return new TripPoint(data);
+  }
+
+  static parseTasks(data) {
+    return data.map(TripPoint.parseTask);
   }
 
   _onEditButtonClick() {
@@ -54,7 +62,7 @@ export class TripPoint extends Component {
 
   get template() {
     return (`<article class="trip-point"> 
-    <i class="trip-icon" >${POINT_VARIABLES.icon[this._icon.toLowerCase()]} </i>
+    <i class="trip-icon" >${POINT_VARIABLES.icon[this._icon.toLowerCase().split(`-`).join(``)]} </i>
     <input type="hidden" class="visually-hidden" value="${this._id}">
     <h3 class="trip-point__title" >${this._icon} to ${this._title}</h3>
     <p class="trip-point__schedule" >
@@ -64,31 +72,23 @@ export class TripPoint extends Component {
     ${this._offerRender(this._offers)}</article>`.trim());
   }
 
-  _offerRender(obj) {
-    if (typeof obj === `object`) {
-      let tempHTML = `<ul class="trip-point__offers">`;
-      for (let item in obj) {
-        if (Object.prototype.hasOwnProperty.call(obj, item)) {
-          if (obj[item].isChecked) {
-            tempHTML += `<li><button class="trip-point__offer">${obj[item].title} + €${obj[item].price}</button></li>`;
-          }
-        }
-      }
-      tempHTML += `</ul>`;
-      return tempHTML;
-    }
-    return ``;
+  _offerRender(arr) {
+    let tempHTML = `<ul class="trip-point__offers">`;
+    tempHTML += arr.filter((item)=>(item.accepted))
+      .map((item)=>(
+        `<li><button class="trip-point__offer">${item.title} + €${item.price}</button></li>`.trim()
+      )).join(``);
+    tempHTML += `</ul>`;
+    return tempHTML;
   }
 
 
   offersPrice() {
     if (this._state.offers) {
-      return Object.keys(this._state.offers).reduce((acc, offer) => {
-        if (this._state.offers[offer].isChecked) {
-          return acc + parseInt(this._state.offers[offer].price, 10);
-        }
-        return acc;
-      }, 0);
+      return this._state.offers.filter((item)=>(item.accepted))
+        .reduce((acc, offer) => {
+          return acc + parseInt(offer.price, 10);
+        }, 0);
     }
     return 0;
   }

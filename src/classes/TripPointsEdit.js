@@ -4,17 +4,17 @@ import flatpickr from 'flatpickr';
 import {POINT_VARIABLES} from '../Database';
 
 export class TripPointEdit extends Component {
-  constructor({id, icon, title, timeStart, timeEnd, price, offers, isFavorite}) {
+  constructor({id, type, destination, date_from, date_to, base_price, offers = [], is_favorite}) {
     super();
     this._id = id;
-    this._icon = icon;
-    this._title = title;
-    this._timeStart = timeStart;
-    this._timeEnd = timeEnd;
-    this._price = price;
+    this._icon = type;
+    this._title = destination.name;
+    this._timeStart = date_from;
+    this._timeEnd = date_to;
+    this._price = base_price;
     this._offers = offers;
     this._element = null;
-    this._isFavorite = isFavorite;
+    this._isFavorite = is_favorite;
     this._state.offers = offers;
     this._journeyPoint = POINT_VARIABLES.title;
     this._onChangeOffers = this._onChangeOffers.bind(this);
