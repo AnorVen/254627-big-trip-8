@@ -1,22 +1,19 @@
 export default class ModelPoint {
   constructor({id, type, destination, date_from, date_to, base_price, offers, is_favorite}) {
-    this._id = id;
-    this._icon = type || ``;
-    this._title = destination.name || ``;
-    this._timeStart = date_from || Date.now();
-    this._timeEnd = date_to || Date.now();
-    this._price = base_price || 0;
-    this._offers = offers || [];
-    this.destination = destination;
-    this._element = null;
-    this._isFavorite = is_favorite || false;
-    this._destination = destination || {description: ``, name: ``, pictures: []};
-    this._onDelete = null;
+    this.id = id;
+    this.icon = type || `bus`;
+    this.title = destination.name || `bus`;
+    this.timeStart = date_from || Date.now();
+    this.timeEnd = date_to || Date.now();
+    this.price = base_price || 0;
+    this.offers = offers || [];
+    this.isFavorite = is_favorite || false;
+    this.destination = destination || {description: ``, name: ``, pictures: []};
   }
 
   toRAW() {
     return {
-      'id': this._id,
+      'id': this.id,
       'title': this.title,
       'due_date': this.dueDate,
       'tags': [...this.tags.values()],

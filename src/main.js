@@ -18,10 +18,13 @@ const END_POINT = `https://es8-demo-srv.appspot.com/big-trip`;
 
 const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
 
+
 api.getTasks()
   .then((tasks) => {
+  console.log(tasks)
     tasksRender(tasks);
   });
+
 
 
 
@@ -127,5 +130,5 @@ function tasksRender(arr) {
 
 window.onload = function () {
   filtersRender(DB.FILTERS_DATA);
- //tasksRender(initialTasks);
+  tasksRender(initialTasks);
 };

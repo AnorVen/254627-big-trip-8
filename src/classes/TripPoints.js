@@ -4,20 +4,20 @@ import momentDurationFormatSetup from 'moment-duration-format'; // без это
 import Component from './Component';
 import {POINT_VARIABLES} from '../Database';
 export class TripPoint extends Component {
-  constructor({id, type, offers = [], date_from, date_to, base_price, is_favorite, destination}) {
+  constructor({id, icon, offers = [], timeStart, timeEnd, price, isFavorite, title}) {
     super();
     this._id = id;
-    this._icon = type || `bus`;
-    this._title = destination.name || `bus`;
-    this._timeStart = date_from;
-    this._timeEnd = date_to;
-    this._price = base_price;
+    this._icon = icon;
+    this._title = title;
+    this._timeStart = timeStart;
+    this._timeEnd = timeEnd;
+    this._price = price;
     this._offers = offers;
-    this._isFavorite = Boolean(is_favorite);
+    this._isFavorite = Boolean(isFavorite);
 
     this._element = null;
     this._onEdit = null;
-    this._state.price = base_price;
+    this._state.price = price;
     this._state.offers = offers;
 
     this.fullPrice = this.fullPrice.bind(this);
@@ -29,23 +29,6 @@ export class TripPoint extends Component {
   unbind() {
     this._element.removeEventListener(`click`, this._onEditButtonClick.bind(this));
   }
-
-
-  toRAW() {
-    return {
-      'id': this.id,
-      'title': this.title,
-      'due_date': this.dueDate,
-      'tags': [...this.tags.values()],
-      'picture': this.picture,
-      'repeating_days': this.repeatingDays,
-      'color': this.color,
-      'is_favorite': this.isFavorite,
-      'is_done': this.isDone,
-    }
-  }
-
-
 
 
   _onEditButtonClick() {
@@ -84,6 +67,9 @@ export class TripPoint extends Component {
   }
 
   _offerRender(arr) {
+    if (arr.length > 2){
+      arr = [arr[0], arr[1]];
+    }
     let tempHTML = `<ul class="trip-point__offers">`;
     tempHTML += arr.filter((item)=>(item.accepted))
       .map((item)=>(
