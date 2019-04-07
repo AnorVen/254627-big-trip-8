@@ -23,7 +23,7 @@ export const POINT_VARIABLES = {
     `sightseeing`,
     `sightseeing`,
   ],
-
+  title: [`Airport`, `Geneva`, `Chamonix`, `a hotel`],
 };
 export const DB = {
   FILTERS_DATA: [

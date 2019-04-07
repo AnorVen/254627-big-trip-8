@@ -57,6 +57,7 @@ export class TripPoint extends Component {
     this._isFavorite = data.isFavorite;
     this._state.offers = data.offers;
     this._state.price = data.price;
+
   }
 
 

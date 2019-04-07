@@ -18,12 +18,10 @@ const END_POINT = `https://es8-demo-srv.appspot.com/big-trip`;
 
 const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
 
-/*
 api.getTasks()
   .then((tasks) => {
     tasksRender(tasks);
   });
-*/
 
 
 
@@ -87,13 +85,12 @@ function filterTasks(initialTasks, target) {
 
 }
 const deleteTask = (tasks, i) => {
-  tasks.splice(i, 1);
-  return tasks;
+ /* tasks.splice(i, 1);*/
+  return  tasks.filter((item) => item.id !== i);
 };
 
-const updateTask = (tasks, i, newTask) => {
-  tasks[i] = Object.assign({}, tasks[i], newTask);
-  return tasks[i];
+const updateTask = (task, newTask) => {
+  return {...task, ...newTask};
 };
 
 function tasksRender(arr) {
@@ -111,7 +108,7 @@ function tasksRender(arr) {
       };
 
       tripPointEdit.onSubmit = (newObject) => {
-        const updatedTask = updateTask(arr, i, newObject);
+        const updatedTask = updateTask(arr[i], newObject);
         tripPoint.update(updatedTask);
         tripPoint.render();
         TripPointsList.replaceChild(tripPoint.element, tripPointEdit.element);
@@ -130,5 +127,5 @@ function tasksRender(arr) {
 
 window.onload = function () {
   filtersRender(DB.FILTERS_DATA);
- tasksRender(initialTasks);
+ //tasksRender(initialTasks);
 };

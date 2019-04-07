@@ -17,9 +17,11 @@ export class TripPointEdit extends Component {
     this._isFavorite = is_favorite;
     this._state.offers = offers;
     this._journeyPoint = POINT_VARIABLES.title;
+    this._destination = destination;
     this._onChangeOffers = this._onChangeOffers.bind(this);
     this._onDelete = null;
   }
+
   bind() {
     this._element.querySelector(`form`)
       .addEventListener(`submit`, this._onSaveButtonClick.bind(this));
@@ -32,35 +34,34 @@ export class TripPointEdit extends Component {
     this._element.querySelector(`.point__offers-wrap`)
       .addEventListener(`change`, this._onChangeOffers);
     // Date Input
-    flatpickr(
-        this._element.querySelector(`.point__date .point__input`),
-        {
-          dateFormat: `m d`,
-          mode: `range`,
-          defaultDate: moment(this._timeStart).format(`MM DD`),
-        });
+    flatpickr(this._element.querySelector(`.point__date .point__input`),
+      {
+        dateFormat: `m d`,
+        mode: `range`,
+        defaultDate: moment(this._timeStart).format(`MM DD`),
+      });
 
     // Time Range
     flatpickr(
-        this._element.querySelector(`.point__time .point__input`),
-        {
-          locale: {
-            rangeSeparator: ` — `
-          },
-          enableTime: true,
-          dateFormat: `H:i`,
-          mode: `range`,
-          // eslint-disable-next-line
-          time_24hr: true,
-          defaultDate: [moment(this._timeStart).format(`HH:mm YYYY MM DD`),
-            moment(this._timeEnd).format(`HH:mm YYYY MM DD`)],
-          minuteIncrement: 10,
-          onClose: (dateObj) => {
-            this._timeStart = dateObj[0];
-            this._timeEnd = dateObj[1];
-            this.reRender();
-          }
-        });
+      this._element.querySelector(`.point__time .point__input`),
+      {
+        locale: {
+          rangeSeparator: ` — `,
+        },
+        enableTime: true,
+        dateFormat: `H:i`,
+        mode: `range`,
+        // eslint-disable-next-line
+        time_24hr: true,
+        defaultDate: [moment(this._timeStart).format(`HH:mm YYYY MM DD`),
+          moment(this._timeEnd).format(`HH:mm YYYY MM DD`)],
+        minuteIncrement: 10,
+        onClose: (dateObj) => {
+          this._timeStart = dateObj[0];
+          this._timeEnd = dateObj[1];
+          this.reRender();
+        },
+      });
   }
 
   set onDelete(fn) {
@@ -86,19 +87,25 @@ export class TripPointEdit extends Component {
 
   _onChangeOffers(evt) {
     evt.preventDefault();
-    this._state.offers[evt.target.value].isChecked = evt.target.checked;
+    this._state.offers.map((item) => {
+      if (item.title === evt.target.value) {
+        item.accepted = evt.target.checked;
+      }
+    });
   }
 
   onTitleChange(evt) {
     this._title = evt.target.value;
     this.reRender();
   }
+
   onIconChange(evt) {
     if (evt.target.tagName === `INPUT`) {
       this._icon = evt.target.value;
       this.reRender();
     }
   }
+
   reRender() {
     this.unbind();
     this._partialUpdate();
@@ -170,7 +177,17 @@ export class TripPointEdit extends Component {
       price: (value) => (target.price = value),
       iconText: (value) => (target.icon = value),
       favorite: (value) => (target.isFavorite = value),
-      offer: (value) => (target.offers[value].isChecked = true)
+      offer: (value) => (target.offers.map((item) => {
+        if (item.title === value) {
+          item.accepted = true;
+        }
+      })),
+
+      /*
+       этот вариант по непонятным для меня причинам не работает
+       offer: (value) => (target.offers.filter((item) => (
+          item.title === value
+        )).accepted = true),*/
     };
   }
 
@@ -190,7 +207,7 @@ export class TripPointEdit extends Component {
                 <label 
                   class="travel-way__label" 
                   for="travel-way__toggle-${this._id}">
-                    ${POINT_VARIABLES.icon[this._icon.toLowerCase()]}️</label>
+                    ${POINT_VARIABLES.icon[this._icon.toLowerCase().split(`-`).join(``)]}️</label>
 
                 <input 
                   type="checkbox" 
@@ -248,7 +265,7 @@ export class TripPointEdit extends Component {
                       id="travel-way-check-in-${this._id}" 
                       name="travel-way-${this._id}" 
                          ${this._icon === `checkin` && `checked`}
-                      value="checkin">
+                      value="check-in">
                     <label class="travel-way__select-label" 
                       for="travel-way-check-in-${this._id}">🏨 check-in</label>
 
@@ -269,7 +286,7 @@ export class TripPointEdit extends Component {
                  id="destination" value="${this._title}"
                   name="destination">
                 <datalist id="destination-select">
-                ${this._journeyPoint.map((item)=>(`<option value="${item}"></option>`).trim()).join(``)}           
+                ${this._journeyPoint.map((item) => (`<option value="${item}"></option>`).trim()).join(``)}           
                 </datalist>
               </div>
 
@@ -308,13 +325,10 @@ export class TripPointEdit extends Component {
               </section>
               <section class="point__destination">
                 <h3 class="point__details-title">Destination</h3>
-                <p class="point__destination-text">Geneva is a city in Switzerland that lies at the southern tip of expansive Lac Léman (Lake Geneva). Surrounded by the Alps and Jura mountains, the city has views of dramatic Mont Blanc.</p>
+                <p class="point__destination-text">${this._destination.description}</p>
                 <div class="point__destination-images">
-                  <img src="http://picsum.photos/330/140?r=123" alt="picture from place" class="point__destination-image">
-                  <img src="http://picsum.photos/300/200?r=1234" alt="picture from place" class="point__destination-image">
-                  <img src="http://picsum.photos/300/100?r=12345" alt="picture from place" class="point__destination-image">
-                  <img src="http://picsum.photos/200/300?r=123456" alt="picture from place" class="point__destination-image">
-                  <img src="http://picsum.photos/100/300?r=1234567" alt="picture from place" class="point__destination-image">
+                ${this._destination.pictures.map((item) => (
+        ` <img src="${item.src}" alt="${item.description}" class="point__destination-image">`.trim())).join(``)}
                 </div>
               </section>
               <input type="hidden" class="point__total-price" name="total-price" value="">
@@ -324,28 +338,18 @@ export class TripPointEdit extends Component {
   }
 
 
-  _offerRender(obj) {
-    if (typeof obj === `object`) {
-      let tempHTML = ``;
-      for (let item in obj) {
-        if (Object.prototype.hasOwnProperty.call(obj, item)) {
-          tempHTML += `
-        <input class="point__offers-input visually-hidden" 
+  _offerRender(arr) {
+    return arr.map((item) => (
+      `<input class="point__offers-input visually-hidden" 
           type="checkbox" 
-          id="${item}-${this._id}" 
+          id="${item.title.toLowerCase().split(` `).join(``)}-${this._id}" 
           name="offer" 
-          value="${item}" 
-          ${obj[item].isChecked && `checked`} >
-        <label for="${item}-${this._id}" 
+          value="${item.title}" 
+          ${item.accepted && `checked`} >
+        <label for="${item.title.toLowerCase().split(` `).join(``)}-${this._id}" 
           class="point__offers-label">
-         <span class="point__offer-service">${obj[item].title}</span> + €<span 
-          class="point__offer-price">${obj[item].price || 0}</span>
-                  </label>`;
-
-        }
-      }
-      return tempHTML;
-    }
-    return ``;
+         <span class="point__offer-service">${item.title}</span> + €<span 
+          class="point__offer-price">${item.price || 0}</span>
+                  </label>`.trim())).join(``);
   }
 }
