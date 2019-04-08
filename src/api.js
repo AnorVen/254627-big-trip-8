@@ -30,6 +30,7 @@ export const API = class {
       .then(ModelPoint.parseTasks);
   }
 
+
   createTask({point}) {
     return this._load({
       url: `points`,
@@ -54,6 +55,15 @@ export const API = class {
 
   deleteTask({id}) {
     return this._load({url: `points/${id}`, method: Method.DELETE});
+  }
+
+  getDestinations(){
+    return this._load({url: `destinations`})
+      .then(toJSON)
+      .then(this.parseDestinations);
+  }
+  parseDestinations(data) {
+    return data;
   }
 
   _load({url, method = Method.GET, body = null, headers = new Headers()}) {

@@ -6,7 +6,7 @@ import {DB} from './Database';
 import {chartConteiner} from './statistic'
 import {API} from './api'
 
-let initialTasks = DB.POINTS_DATA;
+let initialTasks =[];
 
 const MainFilter = document.querySelector(`.trip-filter`);
 const TripPointsList = document.querySelector(`.trip-day__items`);
@@ -17,12 +17,19 @@ const AUTHORIZATION = `Basic dXNlckBwYXNzd29yZAo=${Math.random()}`;
 const END_POINT = `https://es8-demo-srv.appspot.com/big-trip`;
 
 const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
+let destinations;
 
-
+api.getDestinations()
+  .then((data)=>{
+      console.log(data)
+      return destinations = data
+    }
+  );
 api.getTasks()
   .then((tasks) => {
-  console.log(tasks)
+  console.log(tasks);
     tasksRender(tasks);
+    initialTasks = tasks;
   });
 
 
@@ -100,8 +107,8 @@ function tasksRender(arr) {
   if (arr.length) {
     for (let i = 0; i < arr.length; i++) {
       // eslint-disable-next-line
-      let tripPoint = new TripPoint(arr[i]);
-      let tripPointEdit = new TripPointEdit(arr[i]);
+      let tripPoint = new TripPoint({...arr[i], destinations: destinations});
+      let tripPointEdit = new TripPointEdit({...arr[i], destinations: destinations});
       TripPointsList.appendChild(tripPoint.render());
 
       tripPoint.onEdit = () => {
@@ -130,5 +137,5 @@ function tasksRender(arr) {
 
 window.onload = function () {
   filtersRender(DB.FILTERS_DATA);
-  tasksRender(initialTasks);
+ // tasksRender(initialTasks);
 };

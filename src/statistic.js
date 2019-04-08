@@ -40,7 +40,8 @@ export function chartConteiner(points) {
     } else {
       tempDataIcon[temp] = {};
       tempDataIcon[temp].icon =
-        `${POINT_VARIABLES.icon[points[i].icon]} ${points[i].icon.toUpperCase()}`;
+        `${POINT_VARIABLES.icon[points[i].icon.toLowerCase().split(`-`).join(``)]}
+         ${points[i].icon.toUpperCase()}`;
       tempDataIcon[temp].price = +points[i].price + +offersPrice(points[i]);
       tempDataIcon[temp].quantity = 1;
     }
@@ -55,7 +56,7 @@ export function chartConteiner(points) {
   }
 
   // Рассчитаем высоту канваса в зависимости от того, сколько данных в него будет передаваться
-  const BAR_HEIGHT = 55;
+  const BAR_HEIGHT = 20;
   moneyCtx.height = BAR_HEIGHT * points.length;
   transportCtx.height = BAR_HEIGHT * points.length;
   timeSpendCtx.height = BAR_HEIGHT * points.length;

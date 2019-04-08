@@ -4,7 +4,7 @@ import flatpickr from 'flatpickr';
 import {POINT_VARIABLES} from '../Database';
 
 export class TripPointEdit extends Component {
-  constructor({id, icon, destination, timeStart, timeEnd, price, offers, isFavorite, title}) {
+  constructor({id, icon, destination, timeStart, timeEnd, price, offers, isFavorite, title, destinations = POINT_VARIABLES.points}) {
     super();
     this._id = id;
     this._icon = icon;
@@ -16,10 +16,14 @@ export class TripPointEdit extends Component {
     this._element = null;
     this._isFavorite = isFavorite;
     this._state.offers = offers;
-    this._journeyPoint = POINT_VARIABLES.title;
     this._destination = destination;
+    this._pictures = this._destination.pictures;
+    this._destinationName = this._destination.description;
+    this._destinationTitle = this._destination.name;
+
     this._onChangeOffers = this._onChangeOffers.bind(this);
     this._onDelete = null;
+    this._destinations = destinations;
   }
 
   bind() {
@@ -33,35 +37,45 @@ export class TripPointEdit extends Component {
       .addEventListener(`change`, this.onTitleChange.bind(this));
     this._element.querySelector(`.point__offers-wrap`)
       .addEventListener(`change`, this._onChangeOffers);
-    // Date Input
+    this._element.querySelector(`#destination`)
+      .addEventListener(`change`, this._destinationChangeHandler.bind(this));
+
+
+
+
+
+
+
+
+// Date Input
     flatpickr(this._element.querySelector(`.point__date .point__input`),
-      {
-        dateFormat: `m d`,
-        mode: `range`,
-        defaultDate: moment(this._timeStart).format(`MM DD`),
-      });
+        {
+          dateFormat: `m d`,
+          mode: `range`,
+          defaultDate: moment(this._timeStart).format(`MM DD`),
+        });
 
     // Time Range
     flatpickr(
-      this._element.querySelector(`.point__time .point__input`),
-      {
-        locale: {
-          rangeSeparator: ` — `,
-        },
-        enableTime: true,
-        dateFormat: `H:i`,
-        mode: `range`,
-        // eslint-disable-next-line
-        time_24hr: true,
-        defaultDate: [moment(this._timeStart).format(`HH:mm YYYY MM DD`),
-          moment(this._timeEnd).format(`HH:mm YYYY MM DD`)],
-        minuteIncrement: 10,
-        onClose: (dateObj) => {
-          this._timeStart = dateObj[0];
-          this._timeEnd = dateObj[1];
-          this.reRender();
-        },
-      });
+        this._element.querySelector(`.point__time .point__input`),
+        {
+          locale: {
+            rangeSeparator: ` — `,
+          },
+          enableTime: true,
+          dateFormat: `H:i`,
+          mode: `range`,
+          // eslint-disable-next-line
+          time_24hr: true,
+          defaultDate: [moment(this._timeStart).format(`HH:mm YYYY MM DD`),
+            moment(this._timeEnd).format(`HH:mm YYYY MM DD`)],
+          minuteIncrement: 10,
+          onClose: (dateObj) => {
+            this._timeStart = dateObj[0];
+            this._timeEnd = dateObj[1];
+            this.reRender();
+          },
+        });
   }
 
   set onDelete(fn) {
@@ -72,6 +86,23 @@ export class TripPointEdit extends Component {
     if (typeof this._onDelete === `function`) {
       this._onDelete();
     }
+  }
+
+  _destinationChangeHandler(evt) {
+    console.log(1)
+    if (this._destinations.some((item) => item.name === evt.target.value)){
+      this._destination = this._destinations.filter((item) => item.name === evt.target.value)
+    } else {
+      return null;
+    }
+    this._pictures = this._destination.pictures;
+    this._destinationName = this._destination.description;
+    this._destinationTitle = this._destination.name;
+    //TODO надо заставить его перерисовывать описание и картинки.. че происходит - непонимаю
+/*
+    debugger
+
+    this.reRender();*/
   }
 
 
@@ -286,7 +317,7 @@ export class TripPointEdit extends Component {
                  id="destination" value="${this._title}"
                   name="destination">
                 <datalist id="destination-select">
-                ${this._journeyPoint.map((item) => (`<option value="${item}"></option>`).trim()).join(``)}           
+                ${this._destinations.map((item) => (`<option value="${item.name}"></option>`).trim()).join(``)}           
                 </datalist>
               </div>
 
@@ -324,10 +355,10 @@ export class TripPointEdit extends Component {
 
               </section>
               <section class="point__destination">
-                <h3 class="point__details-title">Destination</h3>
-                <p class="point__destination-text">${this._destination.description}</p>
+                <h3 class="point__details-title">Destination ${this._destinationTitle}</h3>
+                <p class="point__destination-text">${this._destinationName}</p>
                 <div class="point__destination-images">
-                ${this._destination.pictures.map((item) => (
+                ${this._pictures.map((item) => (
         ` <img src="${item.src}" alt="${item.description}" class="point__destination-image">`.trim())).join(``)}
                 </div>
               </section>
