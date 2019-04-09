@@ -4,7 +4,7 @@ import flatpickr from 'flatpickr';
 import {POINT_VARIABLES} from '../Database';
 
 export class TripPointEdit extends Component {
-  constructor({id, icon, destination, timeStart, timeEnd, price, offers, isFavorite, title, destinations = POINT_VARIABLES.points}) {
+  constructor({id, icon, destination, timeStart, timeEnd, price, offers, isFavorite, title, destinations, newOffers}) {
     super();
     this._id = id;
     this._icon = icon;
@@ -18,8 +18,9 @@ export class TripPointEdit extends Component {
     this._state.offers = offers;
     this._destination = destination;
     this._pictures = this._destination.pictures;
-    this._destinationName = this._destination.description;
+    this._destinationDesc = this._destination.description;
     this._destinationTitle = this._destination.name;
+    this.newOffers = newOffers;
 
     this._onChangeOffers = this._onChangeOffers.bind(this);
     this._onDelete = null;
@@ -37,6 +38,8 @@ export class TripPointEdit extends Component {
       .addEventListener(`change`, this.onTitleChange.bind(this));
     this._element.querySelector(`.point__offers-wrap`)
       .addEventListener(`change`, this._onChangeOffers);
+    this._element.querySelector(`#destination`)
+      .addEventListener(`change`, this._destinationChangeHandler.bind(this));
     this._element.querySelector(`#destination`)
       .addEventListener(`change`, this._destinationChangeHandler.bind(this));
 
@@ -89,20 +92,15 @@ export class TripPointEdit extends Component {
   }
 
   _destinationChangeHandler(evt) {
-    console.log(1)
     if (this._destinations.some((item) => item.name === evt.target.value)){
-      this._destination = this._destinations.filter((item) => item.name === evt.target.value)
+      this._destination = this._destinations.filter((item) => item.name === evt.target.value)[0]
     } else {
-      return null;
+      this._destination = this._destination;
     }
     this._pictures = this._destination.pictures;
-    this._destinationName = this._destination.description;
+    this._destinationDesc = this._destination.description;
     this._destinationTitle = this._destination.name;
-    //TODO надо заставить его перерисовывать описание и картинки.. че происходит - непонимаю
-/*
-    debugger
-
-    this.reRender();*/
+    this.reRender();
   }
 
 
@@ -356,7 +354,7 @@ export class TripPointEdit extends Component {
               </section>
               <section class="point__destination">
                 <h3 class="point__details-title">Destination ${this._destinationTitle}</h3>
-                <p class="point__destination-text">${this._destinationName}</p>
+                <p class="point__destination-text">${this._destinationDesc}</p>
                 <div class="point__destination-images">
                 ${this._pictures.map((item) => (
         ` <img src="${item.src}" alt="${item.description}" class="point__destination-image">`.trim())).join(``)}

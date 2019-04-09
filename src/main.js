@@ -6,7 +6,7 @@ import {DB} from './Database';
 import {chartConteiner} from './statistic'
 import {API} from './api'
 
-let initialTasks =[];
+let initialTasks = [];
 
 const MainFilter = document.querySelector(`.trip-filter`);
 const TripPointsList = document.querySelector(`.trip-day__items`);
@@ -17,28 +17,54 @@ const AUTHORIZATION = `Basic dXNlckBwYXNzd29yZAo=${Math.random()}`;
 const END_POINT = `https://es8-demo-srv.appspot.com/big-trip`;
 
 const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
-let destinations;
-
+let destinations = [];
+let offers = [];
+let renderFlags = {
+  offers: false,
+  tasks: false,
+  destinations: false
+}
 api.getDestinations()
-  .then((data)=>{
-      console.log(data)
-      return destinations = data
+  .then((data) => {
+      console.log(data);
+      destinations = data;
+      renderFlags.destinations = true;
+    firstRender(initialTasks);
+      console.log(renderFlags)
+    }
+  );
+
+api.getOffers()
+  .then((data) => {
+      console.log(data);
+      offers= data;
+      renderFlags.offers = true;
+    firstRender(initialTasks);
+    console.log(renderFlags)
     }
   );
 api.getTasks()
   .then((tasks) => {
-  console.log(tasks);
-    tasksRender(tasks);
-    initialTasks = tasks;
-  });
+      console.log(tasks);
+      renderFlags.tasks = true;
+      initialTasks = tasks;
+    console.log(initialTasks)
+    firstRender(initialTasks);
+    console.log(renderFlags)
+    }
+  );
 
 
 
-
-
-
-
-
+function firstRender(initialTasks){
+  if(renderFlags.offers === true
+  && renderFlags.tasks  === true
+  && renderFlags.destinations  === true) {
+    console.log(renderFlags)
+    console.log(initialTasks)
+    tasksRender(initialTasks);
+  }
+}
 Statistic.addEventListener('click', statisticClickHandler);
 Table.addEventListener('click', tableClickHandler);
 
@@ -85,18 +111,21 @@ function clickOnFilterHandler(event) {
 
 function filterTasks(initialTasks, target) {
   switch (target) {
-    case `filter-everything`:return initialTasks;
+    case `filter-everything`:
+      return initialTasks;
     case `filter-future`:
       return initialTasks.filter((item) => moment(item.timeStart) > moment(Date.now()));
     case `filter-past`:
       return initialTasks.filter((item) => moment(item.timeStart) < moment(Date.now()));
-    default: return initialTasks;
+    default:
+      return initialTasks;
   }
 
 }
+
 const deleteTask = (tasks, i) => {
- /* tasks.splice(i, 1);*/
-  return  tasks.filter((item) => item.id !== i);
+  /* tasks.splice(i, 1);*/
+  return tasks.filter((item) => item.id !== i);
 };
 
 const updateTask = (task, newTask) => {
@@ -105,10 +134,15 @@ const updateTask = (task, newTask) => {
 
 function tasksRender(arr) {
   if (arr.length) {
+
     for (let i = 0; i < arr.length; i++) {
       // eslint-disable-next-line
-      let tripPoint = new TripPoint({...arr[i], destinations: destinations});
-      let tripPointEdit = new TripPointEdit({...arr[i], destinations: destinations});
+      let tripPoint = new TripPoint({...arr[i], destinations: destinations, newOffers: offers});
+      let tripPointEdit = new TripPointEdit({
+        ...arr[i],
+        destinations: destinations,
+        newOffers: offers
+      });
       TripPointsList.appendChild(tripPoint.render());
 
       tripPoint.onEdit = () => {
@@ -132,10 +166,17 @@ function tasksRender(arr) {
         tripPointEdit.unrender();
       };
     }
+
+    renderFlags = {
+      offers: false,
+      tasks: false,
+      destinations: false
+    }
+
   }
 }
 
 window.onload = function () {
   filtersRender(DB.FILTERS_DATA);
- // tasksRender(initialTasks);
+  // tasksRender(initialTasks);
 };

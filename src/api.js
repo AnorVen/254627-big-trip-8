@@ -1,4 +1,6 @@
-import ModelPoint from './classes/ModelPoint';
+import ModelPoint from './models/ModelPoint';
+import ModelOffer from './models/ModelOffer';
+import ModelDestination from './models/ModelDestination';
 const Method = {
   GET: `GET`,
   POST: `POST`,
@@ -30,6 +32,11 @@ export const API = class {
       .then(ModelPoint.parseTasks);
   }
 
+  getOffers() {
+    return this._load({url: `offers`})
+      .then(toJSON)
+      .then(ModelOffer.parseOffers);
+  }
 
   createTask({point}) {
     return this._load({
@@ -60,11 +67,9 @@ export const API = class {
   getDestinations(){
     return this._load({url: `destinations`})
       .then(toJSON)
-      .then(this.parseDestinations);
+      .then(ModelDestination.parseDestinations);
   }
-  parseDestinations(data) {
-    return data;
-  }
+
 
   _load({url, method = Method.GET, body = null, headers = new Headers()}) {
     headers.append(`Authorization`, this._authorization);

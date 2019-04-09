@@ -14,17 +14,19 @@ export default class ModelPoint {
   toRAW() {
     return {
       'id': this.id,
-      'title': this.title,
-      'due_date': this.dueDate,
-      'tags': [...this.tags.values()],
-      'picture': this.picture,
-      'repeating_days': this.repeatingDays,
-      'color': this.color,
-      'is_favorite': this.isFavorite,
-      'is_done': this.isDone,
+      'type': this.icon,
+      'destination': {
+        'name': this.destination.name,
+        'description': this.destination.description,
+        'pictures': [...this.destination.pictures.values()],
+      },
+      'date_from': this.timeStart,
+      'date_to': this.timeEnd,
+      'base_price': this.price,
+      'offers':  [...this.offers.values()],
+      'is_favorite': this.isFavorite
     };
   }
-
 
   static parseTask(data) {
     return new ModelPoint(data);

@@ -4,7 +4,7 @@ import momentDurationFormatSetup from 'moment-duration-format'; // без это
 import Component from './Component';
 import {POINT_VARIABLES} from '../Database';
 export class TripPoint extends Component {
-  constructor({id, icon, offers = [], timeStart, timeEnd, price, isFavorite, title}) {
+  constructor({id, icon, offers = [], timeStart, timeEnd, price, isFavorite, title, newOffers}) {
     super();
     this._id = id;
     this._icon = icon;
@@ -19,6 +19,7 @@ export class TripPoint extends Component {
     this._onEdit = null;
     this._state.price = price;
     this._state.offers = offers;
+    this._newOffers = newOffers;
 
     this.fullPrice = this.fullPrice.bind(this);
     this.offersPrice = this.offersPrice.bind(this);
