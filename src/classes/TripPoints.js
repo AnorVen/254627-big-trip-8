@@ -68,14 +68,14 @@ export class TripPoint extends Component {
   }
 
   _offerRender(arr) {
-    if (arr.length > 2){
-      arr = [arr[0], arr[1]];
+    let fileteredOffers = arr.filter((item)=>(item.accepted));
+    if (fileteredOffers.length > 2) {
+      fileteredOffers = [fileteredOffers[0], fileteredOffers[1]];
     }
     let tempHTML = `<ul class="trip-point__offers">`;
-    tempHTML += arr.filter((item)=>(item.accepted))
-      .map((item)=>(
-        `<li><button class="trip-point__offer">${item.title} + €${item.price}</button></li>`.trim()
-      )).join(``);
+    tempHTML += fileteredOffers.map((item)=>(
+      `<li><button class="trip-point__offer">${item.title} + €${item.price}</button></li>`.trim()
+    )).join(``);
     tempHTML += `</ul>`;
     return tempHTML;
   }

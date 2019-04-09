@@ -50,6 +50,7 @@ export const API = class {
   }
 
   updateTask({id, data}) {
+    console.log(data)
     return this._load({
       url: `points/${id}`,
       method: Method.PUT,
@@ -62,9 +63,10 @@ export const API = class {
 
   deleteTask({id}) {
     return this._load({url: `points/${id}`, method: Method.DELETE});
+
   }
 
-  getDestinations(){
+  getDestinations() {
     return this._load({url: `destinations`})
       .then(toJSON)
       .then(ModelDestination.parseDestinations);

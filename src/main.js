@@ -20,27 +20,24 @@ const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
 let destinations = [];
 let offers = [];
 let renderFlags = {
+  // надо для проверки, что все точно загрузилось..
   offers: false,
   tasks: false,
   destinations: false
 }
 api.getDestinations()
   .then((data) => {
-      console.log(data);
       destinations = data;
       renderFlags.destinations = true;
     firstRender(initialTasks);
-      console.log(renderFlags)
     }
   );
 
 api.getOffers()
   .then((data) => {
-      console.log(data);
       offers= data;
       renderFlags.offers = true;
     firstRender(initialTasks);
-    console.log(renderFlags)
     }
   );
 api.getTasks()
@@ -48,9 +45,7 @@ api.getTasks()
       console.log(tasks);
       renderFlags.tasks = true;
       initialTasks = tasks;
-    console.log(initialTasks)
     firstRender(initialTasks);
-    console.log(renderFlags)
     }
   );
 
@@ -124,17 +119,21 @@ function filterTasks(initialTasks, target) {
 }
 
 const deleteTask = (tasks, i) => {
-  /* tasks.splice(i, 1);*/
-  return tasks.filter((item) => item.id !== i);
+  api.deleteTask(tasks[i])
+    .then(() => api.getTasks())
+    .then(tasksRender)
+    .catch(alert);
+
 };
 
 const updateTask = (task, newTask) => {
-  return {...task, ...newTask};
+
 };
 
 function tasksRender(arr) {
+  TripPointsList.innerHTML = `Loading route...`;
   if (arr.length) {
-
+    TripPointsList.innerHTML = ``;
     for (let i = 0; i < arr.length; i++) {
       // eslint-disable-next-line
       let tripPoint = new TripPoint({...arr[i], destinations: destinations, newOffers: offers});
@@ -152,18 +151,29 @@ function tasksRender(arr) {
       };
 
       tripPointEdit.onSubmit = (newObject) => {
-        const updatedTask = updateTask(arr[i], newObject);
-        tripPoint.update(updatedTask);
-        tripPoint.render();
-        TripPointsList.replaceChild(tripPoint.element, tripPointEdit.element);
-        tripPointEdit.unrender();
-        arr[i] = updatedTask;
+
+        arr[i].id = newObject.id;
+        arr[i].title = newObject.destination;
+        arr[i].icon = newObject.icon;
+        arr[i].offers =  [...newObject.offers.values()];
+        arr[i].timeStart = newObject.timeStart;
+        arr[i].timeEnd = newObject.timeEnd;
+        arr[i].price = newObject.price;
+        arr[i].isFavorite = newObject.isFavorite;
+        api.updateTask({id: arr[i].id, data: arr[i].toRAW() })
+          .then((newTask)=>{
+              tripPoint.update(newTask);
+              tripPoint.render();
+              TripPointsList.replaceChild(tripPoint.element, tripPointEdit.element);
+              tripPointEdit.unrender();
+          })
       };
 
       tripPointEdit.onDelete = () => {
+
         deleteTask(arr, i);
-        TripPointsList.removeChild(tripPointEdit.element);
-        tripPointEdit.unrender();
+ /*       TripPointsList.removeChild(tripPointEdit.element);
+        tripPointEdit.unrender();*/
       };
     }
 

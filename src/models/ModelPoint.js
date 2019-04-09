@@ -23,7 +23,7 @@ export default class ModelPoint {
       'date_from': this.timeStart,
       'date_to': this.timeEnd,
       'base_price': this.price,
-      'offers':  [...this.offers.values()],
+      'offers': [...this.offers.values()],
       'is_favorite': this.isFavorite
     };
   }
