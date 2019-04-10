@@ -4,7 +4,7 @@ import flatpickr from 'flatpickr';
 import {POINT_VARIABLES} from '../Database';
 
 export class TripPointEdit extends Component {
-  constructor({id, icon, title, timeStart, timeEnd, price, offers, isFavorite}) {
+  constructor({id, icon, destination, timeStart, timeEnd, price, offers, isFavorite, title, destinations, newOffers}) {
     super();
     this._id = id;
     this._icon = icon;
@@ -15,11 +15,23 @@ export class TripPointEdit extends Component {
     this._offers = offers;
     this._element = null;
     this._isFavorite = isFavorite;
+
     this._state.offers = offers;
-    this._journeyPoint = POINT_VARIABLES.title;
-    this._onChangeOffers = this._onChangeOffers.bind(this);
+    this._state.icon = icon;
+    this._destination = destination;
+    this._pictures = this._destination.pictures;
+    this._destinationDesc = this._destination.description;
+    this._destinationTitle = this._destination.name;
+
+
+    this._newOffers = newOffers;
+    this._destinations = destinations;
+
+
     this._onDelete = null;
+    this.apiError = this.apiError.bind(this);
   }
+
   bind() {
     this._element.querySelector(`form`)
       .addEventListener(`submit`, this._onSaveButtonClick.bind(this));
@@ -30,10 +42,13 @@ export class TripPointEdit extends Component {
     this._element.querySelector(`.point__destination-input`)
       .addEventListener(`change`, this.onTitleChange.bind(this));
     this._element.querySelector(`.point__offers-wrap`)
-      .addEventListener(`change`, this._onChangeOffers);
+      .addEventListener(`change`, this._onChangeOffers.bind(this));
+    this._element.querySelector(`#destination`)
+      .addEventListener(`change`, this._destinationChangeHandler.bind(this));
+
+
     // Date Input
-    flatpickr(
-        this._element.querySelector(`.point__date .point__input`),
+    flatpickr(this._element.querySelector(`.point__date .point__input`),
         {
           dateFormat: `m d`,
           mode: `range`,
@@ -45,7 +60,7 @@ export class TripPointEdit extends Component {
         this._element.querySelector(`.point__time .point__input`),
         {
           locale: {
-            rangeSeparator: ` — `
+            rangeSeparator: ` — `,
           },
           enableTime: true,
           dateFormat: `H:i`,
@@ -59,7 +74,7 @@ export class TripPointEdit extends Component {
             this._timeStart = dateObj[0];
             this._timeEnd = dateObj[1];
             this.reRender();
-          }
+          },
         });
   }
 
@@ -67,10 +82,39 @@ export class TripPointEdit extends Component {
     this._onDelete = fn;
   }
 
-  _onResetButtonClick() {
+  apiError() {
+    this._element.classList.add(`shake`);
+  }
+
+  _onResetButtonClick(evt) {
+    evt.preventDefault();
+    this._element.classList.remove(`shake`);
+    let btnDell = evt.target
+      .querySelector(`.point__buttons button.point__button[type="reset"]`);
+    let btnSave = evt.target
+      .querySelector(`.point__buttons button.point__button[type="submit"]`);
+    btnDell.disabled = true;
+    btnSave.disabled = true;
+    btnDell.innerHTML = `Deleting...`;
     if (typeof this._onDelete === `function`) {
       this._onDelete();
     }
+
+    btnDell.innerHTML = `Delete`;
+    btnDell.disabled = false;
+    btnSave.disabled = false;
+  }
+
+  _destinationChangeHandler(evt) {
+    if (this._destinations.some((item) => item.name === evt.target.value)) {
+      this._destination = this._destinations.filter((item) => item.name === evt.target.value)[0];
+    } else {
+      this._destination = this._destination;
+    }
+    this._pictures = this._destination.pictures;
+    this._destinationDesc = this._destination.description;
+    this._destinationTitle = this._destination.name;
+    this.reRender();
   }
 
 
@@ -86,19 +130,35 @@ export class TripPointEdit extends Component {
 
   _onChangeOffers(evt) {
     evt.preventDefault();
-    this._state.offers[evt.target.value].isChecked = evt.target.checked;
+    this._state.offers.map((item) => {
+      if (item.title === evt.target.value) {
+        item.accepted = evt.target.checked;
+      }
+    });
   }
 
   onTitleChange(evt) {
     this._title = evt.target.value;
     this.reRender();
   }
+
   onIconChange(evt) {
     if (evt.target.tagName === `INPUT`) {
-      this._icon = evt.target.value;
+      let target = evt.target.value;
+      if (this._newOffers.some((item) => item.type === target)) {
+        let newOffer = this._newOffers.filter((item) => item.type === target)[0];
+        if (newOffer.type === this._icon) {
+          // TODO если в офферах приходящих с сервера есть офферы с таким же названием, как изначальные офферы - то происходит задвоение.. и надо или фильтровать все офферы на непоыторяемость по тайтлу, или просто перетирать офферы пришедшие в пойнте с сервера...
+          this._state.offers = newOffer.offers.concat(this._offers);
+        } else {
+          this._state.offers = newOffer.offers;
+        }
+        this._state.icon = newOffer.type;
+      }
       this.reRender();
     }
   }
+
   reRender() {
     this.unbind();
     this._partialUpdate();
@@ -112,35 +172,54 @@ export class TripPointEdit extends Component {
   update(data) {
     this._id = data.id;
     this._icon = data.icon;
+    this._state.icon = data.icon;
     this._title = data.title;
     this._timeStart = data.timeStart;
     this._timeEnd = data.timeEnd;
     this._price = data.price;
     this._offers = data.offers;
-    this._timeShift = data.timeShift;
+    this._state.offers = data.offers;
     this._isFavorite = data.isFavorite;
 
   }
 
   set onSubmit(fn) {
+    /*
+      this._element.querySelector(`.point__buttons button.point__button[type="submit"]`)
+        .attributes.disable = true;*/
     this._onSubmit = fn;
+    /*    this._element.querySelector(`.point__buttons button.point__button[type="submit"]`)
+          .attributes.disable = false;
+        this._element.querySelector(`.point__buttons button.point__button[type="submit"]`)
+          .attributes.disable = false; */
   }
 
 
   _onSaveButtonClick(evt) {
     evt.preventDefault();
+    this._element.classList.remove(`shake`);
+    let btnSave = evt.target
+      .querySelector(`.point__buttons button.point__button[type="submit"]`);
+    let btnDell = evt.target
+      .querySelector(`.point__buttons button.point__button[type="reset"]`);
+    btnSave.disabled = true;
+    btnDell.disabled = true;
+    btnSave.innerHTML = `Saving...`;
     const formData = new FormData(this._element.querySelector(`.tripPointForm`));
     const newData = this._processForm(formData);
     if (typeof this._onSubmit === `function`) {
       this._onSubmit(newData);
     }
     this.update(newData);
+    btnSave.innerHTML = `Save`;
+    btnSave.disabled = false;
+    btnDell.disabled = false;
   }
 
   _processForm(formData) {
     const entry = {
       id: ``,
-      title: ``,
+      destination: ``,
       icon: ``,
       offers: this._state.offers,
       timeStart: ``,
@@ -170,7 +249,17 @@ export class TripPointEdit extends Component {
       price: (value) => (target.price = value),
       iconText: (value) => (target.icon = value),
       favorite: (value) => (target.isFavorite = value),
-      offer: (value) => (target.offers[value].isChecked = true)
+      offer: (value) => (target.offers.map((item) => {
+        if (item.title === value) {
+          item.accepted = true;
+        }
+      })),
+
+      /*
+       этот вариант по непонятным для меня причинам не работает
+       offer: (value) => (target.offers.filter((item) => (
+          item.title === value
+        )).accepted = true),*/
     };
   }
 
@@ -184,19 +273,18 @@ export class TripPointEdit extends Component {
                 choose day
                 <input class="point__input" type="text" placeholder="MAR 18" name="day">
               </label>
-
               <div class="travel-way">
-              <input type="hidden" value="${this._icon}" name="iconText">
+              <input type="hidden" value="${this._state.icon}" name="iconText">
                 <label 
                   class="travel-way__label" 
                   for="travel-way__toggle-${this._id}">
-                    ${POINT_VARIABLES.icon[this._icon.toLowerCase()]}️</label>
+                    ${POINT_VARIABLES.icon[this._state.icon.toLowerCase().split(`-`).join(``)]}️</label>
 
                 <input 
                   type="checkbox" 
                   class="travel-way__toggle visually-hidden" 
                   name="icon"
-                  value="${this._icon}"
+                  value="${this._state.icon}"
                   id="travel-way__toggle-${this._id}">
                   
 
@@ -204,7 +292,7 @@ export class TripPointEdit extends Component {
                   <div class="travel-way__select-group">
                   <input class="travel-way__select-input visually-hidden" 
                   type="radio" 
-                  ${this._icon === `flight` && `checked`}
+                  ${this._state.icon === `flight` && `checked`}
                   value="taxi"
                   id="travel-way-taxi-${this._id}" 
                   name="travel-way-${this._id}">
@@ -216,7 +304,7 @@ export class TripPointEdit extends Component {
                       type="radio" 
                       id="travel-way-bus-${this._id}" 
                       name="travel-way-${this._id}" 
-                         ${this._icon === `bus` && `checked`}
+                         ${this._state.icon === `bus` && `checked`}
                         value="bus">
                       <label class="travel-way__select-label"
                        for="travel-way-bus-${this._id}">🚌 bus</label>
@@ -226,7 +314,7 @@ export class TripPointEdit extends Component {
                       id="travel-way-train-${this._id}"
                       name="travel-way-${this._id}" 
                       value="train"
-                        ${this._icon === `train` && `checked`}
+                        ${this._state.icon === `train` && `checked`}
                         >
                       <label class="travel-way__select-label"
                         for="travel-way-train-${this._id}">🚂 train</label>
@@ -236,7 +324,7 @@ export class TripPointEdit extends Component {
                        id="travel-way-flight-${this._id}" 
                        name="travel-way-${this._id}" 
                        value="flight"
-                       ${this._icon === `flight` && `checked`}
+                       ${this._state.icon === `flight` && `checked`}
                        >
                     <label class="travel-way__select-label" 
                     for="travel-way-flight-${this._id}">✈️ flight</label>
@@ -247,15 +335,15 @@ export class TripPointEdit extends Component {
                       type="radio" 
                       id="travel-way-check-in-${this._id}" 
                       name="travel-way-${this._id}" 
-                         ${this._icon === `checkin` && `checked`}
-                      value="checkin">
+                         ${this._state.icon === `checkin` && `checked`}
+                      value="check-in">
                     <label class="travel-way__select-label" 
                       for="travel-way-check-in-${this._id}">🏨 check-in</label>
 
                     <input class="travel-way__select-input visually-hidden" 
                       type="radio" id="travel-way-sightseeing-${this._id}" 
                       name="travel-way-${this._id}" 
-                         ${this._icon === `sightseeing` && `checked`}
+                         ${this._state.icon === `sightseeing` && `checked`}
                       value="sightseeing">
                     <label class="travel-way__select-label" 
                       for="travel-way-sightseeing-${this._id}">🏛 sightseeing</label>
@@ -264,12 +352,12 @@ export class TripPointEdit extends Component {
               </div>
 
               <div class="point__destination-wrap">
-                <label class="point__destination-label" for="destination">${this._icon} to</label>
+                <label class="point__destination-label" for="destination">${this._state.icon} to</label>
                 <input class="point__destination-input" list="destination-select"
                  id="destination" value="${this._title}"
                   name="destination">
                 <datalist id="destination-select">
-                ${this._journeyPoint.map((item)=>(`<option value="${item}"></option>`).trim()).join(``)}           
+                ${this._destinations.map((item) => (`<option value="${item.name}"></option>`).trim()).join(``)}           
                 </datalist>
               </div>
 
@@ -302,19 +390,16 @@ export class TripPointEdit extends Component {
                 <h3 class="point__details-title">offers</h3>
 
                 <div class="point__offers-wrap">
-                  ${this._offerRender(this._offers)}
+                  ${this._offerRender(this._state.offers)}
                 </div>
 
               </section>
               <section class="point__destination">
-                <h3 class="point__details-title">Destination</h3>
-                <p class="point__destination-text">Geneva is a city in Switzerland that lies at the southern tip of expansive Lac Léman (Lake Geneva). Surrounded by the Alps and Jura mountains, the city has views of dramatic Mont Blanc.</p>
+                <h3 class="point__details-title">Destination ${this._destinationTitle}</h3>
+                <p class="point__destination-text">${this._destinationDesc}</p>
                 <div class="point__destination-images">
-                  <img src="http://picsum.photos/330/140?r=123" alt="picture from place" class="point__destination-image">
-                  <img src="http://picsum.photos/300/200?r=1234" alt="picture from place" class="point__destination-image">
-                  <img src="http://picsum.photos/300/100?r=12345" alt="picture from place" class="point__destination-image">
-                  <img src="http://picsum.photos/200/300?r=123456" alt="picture from place" class="point__destination-image">
-                  <img src="http://picsum.photos/100/300?r=1234567" alt="picture from place" class="point__destination-image">
+                ${this._pictures.map((item) => (
+        ` <img src="${item.src}" alt="${item.description}" class="point__destination-image">`.trim())).join(``)}
                 </div>
               </section>
               <input type="hidden" class="point__total-price" name="total-price" value="">
@@ -324,28 +409,18 @@ export class TripPointEdit extends Component {
   }
 
 
-  _offerRender(obj) {
-    if (typeof obj === `object`) {
-      let tempHTML = ``;
-      for (let item in obj) {
-        if (Object.prototype.hasOwnProperty.call(obj, item)) {
-          tempHTML += `
-        <input class="point__offers-input visually-hidden" 
+  _offerRender(arr) {
+    return arr.map((item) => (
+      `<input class="point__offers-input visually-hidden" 
           type="checkbox" 
-          id="${item}-${this._id}" 
+          id="${item.title.toLowerCase().split(` `).join(``)}-${this._id}" 
           name="offer" 
-          value="${item}" 
-          ${obj[item].isChecked && `checked`} >
-        <label for="${item}-${this._id}" 
+          value="${item.title}" 
+          ${item.accepted && `checked`} >
+        <label for="${item.title.toLowerCase().split(` `).join(``)}-${this._id}" 
           class="point__offers-label">
-         <span class="point__offer-service">${obj[item].title}</span> + €<span 
-          class="point__offer-price">${obj[item].price || 0}</span>
-                  </label>`;
-
-        }
-      }
-      return tempHTML;
-    }
-    return ``;
+         <span class="point__offer-service">${item.title}</span> + €<span 
+          class="point__offer-price">${item.price || 0}</span>
+                  </label>`.trim())).join(``);
   }
 }
