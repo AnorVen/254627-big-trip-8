@@ -50,7 +50,6 @@ export const API = class {
   }
 
   updateTask({id, data}) {
-    console.log(data)
     return this._load({
       url: `points/${id}`,
       method: Method.PUT,
@@ -79,7 +78,6 @@ export const API = class {
     return fetch(`${this._endPoint}/${url}`, {method, body, headers})
       .then(checkStatus)
       .catch((err) => {
-        console.error(`fetch error: ${err}`);
         throw err;
       });
   }

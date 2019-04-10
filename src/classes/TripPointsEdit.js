@@ -29,7 +29,7 @@ export class TripPointEdit extends Component {
 
 
     this._onDelete = null;
-
+    this.apiError = this.apiError.bind(this);
   }
 
   bind() {
@@ -45,12 +45,6 @@ export class TripPointEdit extends Component {
       .addEventListener(`change`, this._onChangeOffers.bind(this));
     this._element.querySelector(`#destination`)
       .addEventListener(`change`, this._destinationChangeHandler.bind(this));
-
-
-
-
-
-
 
 
     // Date Input
@@ -88,15 +82,32 @@ export class TripPointEdit extends Component {
     this._onDelete = fn;
   }
 
-  _onResetButtonClick() {
+  apiError() {
+    this._element.classList.add(`shake`);
+  }
+
+  _onResetButtonClick(evt) {
+    evt.preventDefault();
+    this._element.classList.remove(`shake`);
+    let btnDell = evt.target
+      .querySelector(`.point__buttons button.point__button[type="reset"]`);
+    let btnSave = evt.target
+      .querySelector(`.point__buttons button.point__button[type="submit"]`);
+    btnDell.disabled = true;
+    btnSave.disabled = true;
+    btnDell.innerHTML = `Deleting...`;
     if (typeof this._onDelete === `function`) {
       this._onDelete();
     }
+
+    btnDell.innerHTML = `Delete`;
+    btnDell.disabled = false;
+    btnSave.disabled = false;
   }
 
   _destinationChangeHandler(evt) {
-    if (this._destinations.some((item) => item.name === evt.target.value)){
-      this._destination = this._destinations.filter((item) => item.name === evt.target.value)[0]
+    if (this._destinations.some((item) => item.name === evt.target.value)) {
+      this._destination = this._destinations.filter((item) => item.name === evt.target.value)[0];
     } else {
       this._destination = this._destination;
     }
@@ -173,18 +184,36 @@ export class TripPointEdit extends Component {
   }
 
   set onSubmit(fn) {
+    /*
+      this._element.querySelector(`.point__buttons button.point__button[type="submit"]`)
+        .attributes.disable = true;*/
     this._onSubmit = fn;
+    /*    this._element.querySelector(`.point__buttons button.point__button[type="submit"]`)
+          .attributes.disable = false;
+        this._element.querySelector(`.point__buttons button.point__button[type="submit"]`)
+          .attributes.disable = false; */
   }
 
 
   _onSaveButtonClick(evt) {
     evt.preventDefault();
+    this._element.classList.remove(`shake`);
+    let btnSave = evt.target
+      .querySelector(`.point__buttons button.point__button[type="submit"]`);
+    let btnDell = evt.target
+      .querySelector(`.point__buttons button.point__button[type="reset"]`);
+    btnSave.disabled = true;
+    btnDell.disabled = true;
+    btnSave.innerHTML = `Saving...`;
     const formData = new FormData(this._element.querySelector(`.tripPointForm`));
     const newData = this._processForm(formData);
     if (typeof this._onSubmit === `function`) {
       this._onSubmit(newData);
     }
     this.update(newData);
+    btnSave.innerHTML = `Save`;
+    btnSave.disabled = false;
+    btnDell.disabled = false;
   }
 
   _processForm(formData) {
