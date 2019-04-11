@@ -9,7 +9,7 @@ const Method = {
 };
 
 const checkStatus = (response) => {
-  if (response.status >= 200 && response.status < 300) {
+  if (response.ok) {
     return response;
   } else {
     throw new Error(`${response.status}: ${response.statusText}`);
@@ -39,6 +39,7 @@ export const API = class {
   }
 
   createTask({point}) {
+    console.log(point)
     return this._load({
       url: `points`,
       method: Method.POST,
