@@ -35,7 +35,7 @@ export class TripPointEdit extends Component {
 
   bind() {
     this._element.querySelector(`form`)
-      .addEventListener(`keydown`, this._onEscBtnPress.bind(this));
+      .addEventListener(`keydown`, this._onEscBtnPress).bind(this);
     this._element.querySelector(`form`)
       .addEventListener(`submit`, this._onSaveButtonClick.bind(this));
     this._element.querySelector(`form`)
@@ -94,7 +94,7 @@ export class TripPointEdit extends Component {
   }
   _onEscBtnPress() {
     if (typeof this._onDelete === `function`) {
-      this._onDelete();
+      this._onEscBtnPress();
     }
   }
 

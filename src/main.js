@@ -8,15 +8,13 @@ import {API} from './api'
 import {SortsBtn} from "./classes/SortsBtn";
 import ModelPoint from "./models/ModelPoint"
 
-let initialTasks = [];
-
-
 const NewPiont = document.querySelector(`.trip-controls__new-event`);
 const MainSort = document.querySelector(`.trip-sorting`);
 const MainFilter = document.querySelector(`.trip-filter`);
 const TripPointsList = document.querySelector(`.trip-day__items`);
 const Statistic = document.querySelector(`a[href="#stats"]`);
 const Table = document.querySelector(`a[href="#table"]`);
+const TotalCost = document.querySelector(`.trip__total-cost`);
 
 const AUTHORIZATION = `Basic dXNlckBwYXNzd29yZAo=${Math.random()}`;
 const END_POINT = `https://es8-demo-srv.appspot.com/big-trip`;
@@ -30,6 +28,35 @@ let renderFlags = {
   tasks: false,
   destinations: false
 }
+
+let initialTasks = [];
+
+/*let mutationObserver = new MutationObserver(function(mutations) {
+  mutations.forEach(function(mutation) {
+    console.log(mutation);
+    totalCostHandler(initialTasks)
+
+  });
+});
+
+mutationObserver.observe(TripPointsList, {
+  attributes: false,
+  characterData: false,
+  childList: true,
+  subtree: true,
+  attributeOldValue: false,
+  characterDataOldValue: false
+});*/
+
+function totalCostHandler(arr = []) {
+  let totalCost = arr.reduce((acc, item) => {
+    return acc + fullprice(item);
+  }, 0);
+
+  TotalCost.innerHTML = `&nbsp; ${totalCost}`
+}
+
+
 api.getDestinations()
   .then((data) => {
       destinations = data;
@@ -127,6 +154,18 @@ function newPointHandler() {
           `Something went wrong while loading your route info. Check your connection or try again later`;
         throw err;
       });
+
+  }
+
+  newPointEdit.onEscBtnPress = (evt) => {
+    if (evt.keyCode === 27) {
+      TripPointsList.removeChild(newPointEdit.element);
+      newPointEdit.unrender();
+    }
+  };
+  newPointEdit.onDelete = () => {
+    TripPointsList.removeChild(newPointEdit.element);
+    newPointEdit.unrender();
 
   }
 }
@@ -286,9 +325,9 @@ function tasksRender(arr) {
           })
       };
 
-      tripPointEdit.onEscBtnPress = (evt)=>{
+      tripPointEdit.onEscBtnPress = (evt) => {
         // TODO сейчас работает только если тыкать esc в инпуте.. а тадо.. немного непонятно как закрывать конкретную точку, если открыты несколько.. и не работает пока что даже на одной не в инпуте
-        if(evt.keyCode === 27) {
+        if (evt.keyCode === 27) {
           tripPoint.render();
           TripPointsList.replaceChild(tripPoint.element, tripPointEdit.element);
           tripPointEdit.update({
@@ -317,6 +356,7 @@ function tasksRender(arr) {
 
   }
 }
+
 
 window.onload = function () {
   filtersRender(DB.FILTERS_DATA);
