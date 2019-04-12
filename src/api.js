@@ -39,7 +39,6 @@ export const API = class {
   }
 
   createTask({point}) {
-    console.log(point)
     return this._load({
       url: `points`,
       method: Method.POST,
@@ -81,5 +80,15 @@ export const API = class {
       .catch((err) => {
         throw err;
       });
+  }
+
+  syncTasks({tasks}) {
+    return this._load({
+      url: `tasks/sync`,
+      method: `POST`,
+      body: JSON.stringify(tasks),
+      headers: new Headers({'Content-Type': `application/json`})
+    })
+      .then(toJSON);
   }
 };

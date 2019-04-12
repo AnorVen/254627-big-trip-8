@@ -7,6 +7,8 @@ import { chartConteiner } from './statistic';
 import { API } from './api';
 import { SortsBtn } from './classes/SortsBtn';
 import ModelPoint from './models/ModelPoint';
+import {Provider} from './provider/Provider';
+import {Store} from './Store/Store';
 
 const NewPiont = document.querySelector(`.trip-controls__new-event`);
 const MainSort = document.querySelector(`.trip-sorting`);
@@ -18,17 +20,20 @@ const TotalCost = document.querySelector(`.trip__total-cost`);
 
 const AUTHORIZATION = `Basic dXNlckBwYXNzd29yZAo=${Math.random()}`;
 const END_POINT = `https://es8-demo-srv.appspot.com/big-trip`;
+const TASKS_STORE_KEY = `tasks-store-key`;
 
 const api = new API({ endPoint: END_POINT, authorization: AUTHORIZATION });
+const store = new Store({key: TASKS_STORE_KEY, storage: localStorage});
+const provider = new Provider({api, store, generateId: () => String(Date.now())});
+
 let destinations = [];
 let offers = [];
-let renderFlags = {
-  // надо для проверки, что все точно загрузилось..
-  offers: false,
-  tasks: false,
-  destinations: false,
-};
 const escKeyKode = 27;
+window.addEventListener(`offline`, () => document.title = `${document.title}[OFFLINE]`);
+window.addEventListener(`online`, () => {
+  document.title = document.title.split(`[OFFLINE]`)[0];
+  provider.syncTasks();
+});
 window.addEventListener('keydown', escKeyHandler);
 
 function escKeyHandler(evt) {
@@ -47,62 +52,36 @@ function totalCostHandler(arr = []) {
 
   TotalCost.innerHTML = `&nbsp; ${totalCost}`;
 }
-
-api
+let apiDest = provider
   .getDestinations()
   .then((data) => {
     destinations = data;
-    renderFlags.destinations = true;
-    firstRender(initialTasks);
-  })
-  .catch((err) => {
-    console.error(`fetch error: ${err}`);
-    TripPointsList.innerHTML = `Something went wrong while loading your route info. Check your connection or try again later`;
-    throw err;
   });
-
-api
+let apiOffers = provider
   .getOffers()
   .then((data) => {
     offers = data;
-    renderFlags.offers = true;
-    firstRender(initialTasks);
-  })
-  .catch((err) => {
-    console.error(`fetch error: ${err}`);
-    TripPointsList.innerHTML = `Something went wrong while loading your route info. Check your connection or try again later`;
-    throw err;
   });
-
-api
+let apiTasks = provider
   .getTasks()
   .then((tasks) => {
-    renderFlags.tasks = true;
     initialTasks = tasks;
-    firstRender(initialTasks);
-  })
-  .catch((err) => {
-    console.error(`fetch error: ${err}`);
-    TripPointsList.innerHTML = `Something went wrong while loading your route info. Check your connection or try again later`;
-    throw err;
   });
+Promise.all([apiDest, apiOffers, apiTasks])
+  .then(()=>tasksRender(initialTasks))
+  .catch((err) => {
+  console.error(`fetch error: ${err}`);
+  TripPointsList.innerHTML = `Something went wrong while loading your route info. Check your connection or try again later`;
+  throw err;
+});
 
-function firstRender(initialTasks) {
-  TripPointsList.innerHTML = `Loading route...`;
-  if (
-    renderFlags.offers === true &&
-    renderFlags.tasks === true &&
-    renderFlags.destinations === true
-  ) {
-    tasksRender(initialTasks);
-  }
-}
+TripPointsList.innerHTML = `Loading route...`;
 
 NewPiont.addEventListener(`click`, newPointHandler);
 
 function newPointHandler() {
   let newPointEdit = new TripPointEdit({
-    ...ModelPoint.parseTask(DB.NEW_POINT),
+    ...ModelPoint.parseTask(DB.NEW_POINT), // eslint-disable-line
     id: initialTasks.length,
     destinations: destinations,
     newOffers: offers,
@@ -130,7 +109,7 @@ function newPointHandler() {
     point.price = newObject.price;
     point.isFavorite = newObject.isFavorite;
 
-    api
+    provider
       .createTask({ point: point.toRAW() })
       .catch(() => newPointEdit.apiError())
       .then(() => console.log(`createTask ок`))
@@ -284,7 +263,7 @@ function tasksRender(arr) {
         point.price = newObject.price;
         point.isFavorite = newObject.isFavorite;
 
-        api
+        provider
           .updateTask({ id: point.id, data: point.toRAW() })
           .catch(() => tripPointEdit.apiError())
           .then((newTask) => {
@@ -297,20 +276,14 @@ function tasksRender(arr) {
       };
 
       tripPointEdit.onDelete = () => {
-        api
+        provider
           .deleteTask(point)
           .catch(tripPointEdit.apiError())
-          .then(() => api.getTasks())
+          .then(() => provider.getTasks())
           .then(tasksRender)
           .catch(alert);
       };
     }
-
-    renderFlags = {
-      offers: false,
-      tasks: false,
-      destinations: false,
-    };
   }
 }
 
