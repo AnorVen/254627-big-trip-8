@@ -39,6 +39,7 @@ function escKeyHandler(evt) {
 
 let initialTasks = [];
 
+// TODO сделать расчет общей суммы. будет сделано через расчет суммы в сторе, т.к. иначе надо отдельно парсить весь сетейт на каждое изменение...
 function totalCostHandler(arr = []) {
   let totalCost = arr.reduce((acc, item) => {
     return acc + fullprice(item);
