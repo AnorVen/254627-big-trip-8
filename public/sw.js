@@ -2,7 +2,8 @@ const CACHE_NAME = `Points`;
 self.addEventListener('install', (event) => {
   console.log(`sw, install`, {event});
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
+    caches.open(CACHE_NAME)
+      .then((cache) => {
       return cache.addAll([
         `./`,
         `./index.html`,
@@ -20,21 +21,20 @@ self.addEventListener('install', (event) => {
 self.addEventListener(`activate`, (evt) => {
   console.log(`sw`, `activate`, {evt});
 });
+
 self.addEventListener('fetch', (event) => {
+
   event.respondWith(
     // TODO разобраться с этим...
     caches.match(event.request)
       .then((response) => {
-        // caches.match() always resolves
-        // but in case of success response will have value
+        console.log(response)
         if (response !== undefined) {
           console.log(`Find in cache`, {response});
           return response;
         } else {
-          return fetch(event.request).then( (response)=> {
-            // response may be used only once
-            // we need to save clone to put one copy in cache
-            // and serve second one
+          return fetch(event.request)
+            .then( (response)=> {
             let responseClone = response.clone();
 
             caches.open(CACHE_NAME).then((cache) => {

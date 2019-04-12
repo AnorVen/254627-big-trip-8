@@ -29,6 +29,7 @@ const provider = new Provider({api, store, generateId: () => String(Date.now())}
 let destinations = [];
 let offers = [];
 const escKeyKode = 27;
+let initialTasks = [];
 window.addEventListener(`offline`, () => document.title = `${document.title}[OFFLINE]`);
 window.addEventListener(`online`, () => {
   document.title = document.title.split(`[OFFLINE]`)[0];
@@ -42,7 +43,7 @@ function escKeyHandler(evt) {
   }
 }
 
-let initialTasks = [];
+
 
 function totalCostHandler(arr = []) {
   let totalCost = 0;
@@ -279,11 +280,10 @@ function tasksRender(arr) {
       };
 
       tripPointEdit.onDelete = () => {
-        provider
-          .deleteTask(point)
-          .catch(tripPointEdit.apiError())
+        provider.deleteTask(point)
+          .catch(()=>tripPointEdit.apiError())
           .then(() => provider.getTasks())
-          .then(tasksRender)
+          .then((tasks)=> tasksRender(tasks))
           .catch(alert);
       };
     }
