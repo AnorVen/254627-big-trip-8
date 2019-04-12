@@ -29,13 +29,10 @@ export class TripPointEdit extends Component {
 
 
     this._onDelete = null;
-    this._onEscBtnPress = null;
     this.apiError = this.apiError.bind(this);
   }
 
   bind() {
-    this._element.querySelector(`form`)
-      .addEventListener(`keydown`, this._onEscBtnPress).bind(this);
     this._element.querySelector(`form`)
       .addEventListener(`submit`, this._onSaveButtonClick.bind(this));
     this._element.querySelector(`form`)
@@ -89,14 +86,6 @@ export class TripPointEdit extends Component {
     this._element.classList.add(`shake`);
   }
 
-  set onEscBtnPress(fn) {
-    this._onEscBtnPress = fn;
-  }
-  _onEscBtnPress() {
-    if (typeof this._onDelete === `function`) {
-      this._onEscBtnPress();
-    }
-  }
 
   _onResetButtonClick(evt) {
     evt.preventDefault();
