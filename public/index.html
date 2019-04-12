@@ -47,7 +47,7 @@
         <h1 class="trip__points">Amsterdam&nbsp;&mdash; Geneva&nbsp;&mdash;  Chamonix</h1>
         <p class="trip__dates">Mar 17&nbsp;&mdash; 19</p>
       </div>
-      <p class="trip__total">Total: <span class="trip__total-cost">&euro;&nbsp;1500</span></p>
+      <p class="trip__total">Total: <span class="trip__total-cost">&euro;&nbsp;0</span></p>
     </section>
 
     <section class="trip-controls">
@@ -106,6 +106,23 @@
     </div>
   </section>
 </main>
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js', { scope: './' }).then(function(reg) {
+      if(reg.installing) {
+        console.log('Service worker installing');
+      } else if(reg.waiting) {
+        console.log('Service worker installed');
+      } else if(reg.active) {
+        console.log('Service worker active');
+      }
+
+    }).catch(function(error) {
+      // registration failed
+      console.log('Registration failed with ' + error);
+    });
+  }
+</script>
 <script src="./bundle.js"></script>
 </body>
 </html>

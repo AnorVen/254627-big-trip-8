@@ -28,19 +28,20 @@ export const Provider = class {
     }
   }
 
-  createTask({task}) {
+  createTask({point}) {
     if (this._isOnline()) {
-      return this._api.createTask({task})
-        .then((point) => {
-          this._store.setItem({key: point.id, item: point.toRAW()});
-          return point;
+      console.log(point)
+      return this._api.createTask({point})
+        .then((data) => {
+          this._store.setItem({key: data.id, item: data.toRAW()});
+          return data;
         });
     } else {
-      task.id = this._generateId();
+      point.id = this._generateId();
       this._needSync = true;
 
-      this._store.setItem({key: task.id, item: task});
-      return Promise.resolve(ModelPoint.parseTask(task));
+      this._store.setItem({key: point.id, item: point});
+      return Promise.resolve(ModelPoint.parseTask(point));
     }
   }
 

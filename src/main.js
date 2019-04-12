@@ -44,13 +44,14 @@ function escKeyHandler(evt) {
 
 let initialTasks = [];
 
-// TODO сделать расчет общей суммы. будет сделано через расчет суммы в сторе, т.к. иначе надо отдельно парсить весь сетейт на каждое изменение...
 function totalCostHandler(arr = []) {
-  let totalCost = arr.reduce((acc, item) => {
-    return acc + fullprice(item);
-  }, 0);
-
-  TotalCost.innerHTML = `&nbsp; ${totalCost}`;
+  let totalCost = 0;
+  if(arr.length) {
+    totalCost += arr.reduce((acc, item) => {
+      return acc + +fullprice(item);
+    }, 0);
+  }
+  TotalCost.innerHTML = `&euro;&nbsp;${totalCost}`;
 }
 let apiDest = provider
   .getDestinations()
@@ -114,8 +115,8 @@ function newPointHandler() {
       .catch(() => newPointEdit.apiError())
       .then(() => console.log(`createTask ок`))
       .catch(() => newPointEdit.apiError())
-      .then(() => api.getTasks())
-      .then(tasksRender)
+      .then(() => provider.getTasks())
+      .then((points)=>tasksRender(points))
       .catch((err) => {
         console.error(`fetch error: ${err}`);
         TripPointsList.innerHTML = `Something went wrong while loading your route info. Check your connection or try again later`;
@@ -219,10 +220,10 @@ function sortTasks(initialTasks, target) {
 
 function fullprice(item) {
   let fullPrice = 0;
-  fullPrice += item.price;
+  fullPrice += +item.price;
   for (let i = 0; i < item.offers.length; i++) {
     if (item.offers[i].accepted) {
-      fullPrice += item.offers[i].price;
+      fullPrice += +item.offers[i].price;
     }
   }
   return fullPrice;
@@ -231,6 +232,7 @@ function fullprice(item) {
 function tasksRender(arr) {
   if (arr.length) {
     TripPointsList.innerHTML = ``;
+    totalCostHandler(arr);
     for (let i = 0; i < arr.length; i++) {
       let point = arr[i];
 
@@ -272,6 +274,7 @@ function tasksRender(arr) {
             tripPoint.render();
             TripPointsList.replaceChild(tripPoint.element, tripPointEdit.element);
             tripPointEdit.unrender();
+            totalCostHandler(arr)
           });
       };
 
