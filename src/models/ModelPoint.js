@@ -3,7 +3,6 @@ export default class ModelPoint {
     this.id = id;
     this.icon = type || `bus`;
     this.title = destination.name || ``;
-
     this.timeStart = date_from || Date.now(); // eslint-disable-line
     this.timeEnd = date_to || Date.now(); // eslint-disable-line
     this.price = base_price || 0; // eslint-disable-line

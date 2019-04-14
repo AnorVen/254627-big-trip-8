@@ -30,7 +30,6 @@ export const Provider = class {
 
   createTask({point}) {
     if (this._isOnline()) {
-      console.log(point)
       return this._api.createTask({point})
         .then((data) => {
           this._store.setItem({key: data.id, item: data.toRAW()});
