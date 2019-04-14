@@ -265,7 +265,6 @@ function tasksRender(arr) {
         point.timeEnd = newObject.timeEnd;
         point.price = newObject.price;
         point.isFavorite = newObject.isFavorite;
-
         provider
           .updateTask({ id: point.id, data: point.toRAW() })
           .catch(() => tripPointEdit.apiError())

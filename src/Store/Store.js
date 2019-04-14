@@ -33,7 +33,7 @@ export const Store = class {
     try {
       return JSON.parse(items);
     } catch (e) {
-      console.error(`Error parse items. Error: ${e}. Items: ${items}`); // eslint-disable-line
+      alert(`Error parse items. Error: ${e}. Items: ${items}`); // eslint-disable-line
       return emptyItems;
     }
   }

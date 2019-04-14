@@ -258,7 +258,7 @@ export class TripPointEdit extends Component {
   }
 
   get template() {
-    return (` <article class="point">
+    return (` <article class="point ${this._id}">
          <div>    
           <form action="" method="get" class="tripPointForm">
             <header class="point__header">
