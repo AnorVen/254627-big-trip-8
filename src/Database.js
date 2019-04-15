@@ -95,11 +95,11 @@ export const DB = {
     },
     type: `taxi`,
     id: `0`,
-    is_favorite: false, // eslint-disable-line
+    [`is_favorite`]: false,
     offers: [],
-    base_price: `0`, // eslint-disable-line
-    date_from: Date.now(), // eslint-disable-line
-    date_to: Date.now(), // eslint-disable-line
+    [`base_price`]: `0`,
+    [`date_from`]: Date.now(),
+    [`date_to`]: Date.now(),
     title: `Новая точка`
   }
 };
