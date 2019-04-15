@@ -1,14 +1,15 @@
 import moment from 'moment';
-import { TripPoint } from './classes/TripPoints';
-import { TripPointEdit } from './classes/TripPointsEdit';
-import { Filters } from './classes/Filters';
-import { DB } from './Database';
-import { chartConteiner } from './statistic';
-import { API } from './api';
-import { SortsBtn } from './classes/SortsBtn';
+import {TripPoint} from './classes/TripPoints';
+import {TripPointEdit} from './classes/TripPointsEdit';
+import {Filters} from './classes/Filters';
+import {DB} from './Database';
+import {chartConteiner} from './statistic';
+import {API} from './api';
+import {SortsBtn} from './classes/SortsBtn';
 import ModelPoint from './models/ModelPoint';
 import {Provider} from './provider/Provider';
 import {Store} from './Store/Store';
+import _ from 'lodash';
 
 const NewPiont = document.querySelector(`.trip-controls__new-event`);
 const MainSort = document.querySelector(`.trip-sorting`);
@@ -22,7 +23,7 @@ const AUTHORIZATION = `Basic dXNlckBwYXNzd29yZAo=${Math.random()}`;
 const END_POINT = `https://es8-demo-srv.appspot.com/big-trip`;
 const TASKS_STORE_KEY = `tasks-store-key`;
 
-const api = new API({ endPoint: END_POINT, authorization: AUTHORIZATION });
+const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
 const store = new Store({key: TASKS_STORE_KEY, storage: localStorage});
 const provider = new Provider({api, store, generateId: () => String(Date.now())});
 
@@ -30,12 +31,12 @@ let destinations = [];
 let offers = [];
 const escKeyKode = 27;
 let initialTasks = [];
-window.addEventListener(`offline`, () => document.title = `${document.title}[OFFLINE]`);
+window.addEventListener(`offline`, () => (document.title = `${document.title}[OFFLINE]`));
 window.addEventListener(`online`, () => {
   document.title = document.title.split(`[OFFLINE]`)[0];
   provider.syncTasks();
 });
-window.addEventListener('keydown', escKeyHandler);
+window.addEventListener(`keydown`, escKeyHandler);
 
 function escKeyHandler(evt) {
   if (evt.keyCode === escKeyKode) {
@@ -44,16 +45,16 @@ function escKeyHandler(evt) {
 }
 
 
-
 function totalCostHandler(arr = []) {
   let totalCost = 0;
-  if(arr.length) {
+  if (arr.length) {
     totalCost += arr.reduce((acc, item) => {
       return acc + +fullprice(item);
     }, 0);
   }
   TotalCost.innerHTML = `&euro;&nbsp;${totalCost}`;
 }
+
 let apiDest = provider
   .getDestinations()
   .then((data) => {
@@ -70,24 +71,24 @@ let apiTasks = provider
     initialTasks = tasks;
   });
 Promise.all([apiDest, apiOffers, apiTasks])
-  .then(()=>tasksRender(initialTasks))
+  .then(() => tasksRender(initialTasks))
   .catch((err) => {
-  console.error(`fetch error: ${err}`);
-  TripPointsList.innerHTML = `Something went wrong while loading your route info. Check your connection or try again later`;
-  throw err;
-});
+    TripPointsList.innerHTML = `Something went wrong while loading your route info. Check your connection or try again later. fetch error: ${err}`;
+    throw err;
+  });
 
 TripPointsList.innerHTML = `Loading route...`;
 
 NewPiont.addEventListener(`click`, newPointHandler);
 
 function newPointHandler() {
-  let newPointEdit = new TripPointEdit({
-    ...ModelPoint.parseTask(DB.NEW_POINT), // eslint-disable-line
-    id: initialTasks.length,
-    destinations: destinations,
-    newOffers: offers,
-  });
+  let newPointEdit = new TripPointEdit(
+      _.assignIn(
+          ModelPoint.parseTask(DB.NEW_POINT),
+          {id: initialTasks.length},
+          {destinations},
+          {newOffers: offers})
+  );
   TripPointsList.insertBefore(newPointEdit.render(), TripPointsList.children[0]);
   let point = ModelPoint.parseTask(DB.NEW_POINT);
 
@@ -112,15 +113,12 @@ function newPointHandler() {
     point.isFavorite = newObject.isFavorite;
 
     provider
-      .createTask({ point: point.toRAW() })
-      .catch(() => newPointEdit.apiError())
-      .then(() => console.log(`createTask ок`))
+      .createTask({point: point.toRAW()})
       .catch(() => newPointEdit.apiError())
       .then(() => provider.getTasks())
-      .then((points)=>tasksRender(points))
+      .then((points) => tasksRender(points))
       .catch((err) => {
-        console.error(`fetch error: ${err}`);
-        TripPointsList.innerHTML = `Something went wrong while loading your route info. Check your connection or try again later`;
+        TripPointsList.innerHTML = `Something went wrong while loading your route info. Check your connection or try again later. fetch error: ${err}`;
         throw err;
       });
   };
@@ -131,8 +129,8 @@ function newPointHandler() {
   };
 }
 
-Statistic.addEventListener('click', statisticClickHandler);
-Table.addEventListener('click', tableClickHandler);
+Statistic.addEventListener(`click`, statisticClickHandler);
+Table.addEventListener(`click`, tableClickHandler);
 
 function statisticClickHandler(event) {
   event.preventDefault();
@@ -171,16 +169,16 @@ function clickOnFilterHandler(event) {
   }
 }
 
-function filterTasks(initialTasks, target) {
+function filterTasks(points, target) {
   switch (target) {
     case `filter-everything`:
-      return initialTasks;
+      return points;
     case `filter-future`:
-      return initialTasks.filter((item) => moment(item.timeStart) > moment(Date.now()));
+      return points.filter((item) => moment(item.timeStart) > moment(Date.now()));
     case `filter-past`:
-      return initialTasks.filter((item) => moment(item.timeStart) < moment(Date.now()));
+      return points.filter((item) => moment(item.timeStart) < moment(Date.now()));
     default:
-      return initialTasks;
+      return points;
   }
 }
 
@@ -204,18 +202,18 @@ function clickOnSortHandler(event) {
   }
 }
 
-function sortTasks(initialTasks, target) {
+function sortTasks(points, target) {
   switch (target) {
     case `sorting-event`:
-      return initialTasks.sort((a, b) => (a.id > b.id ? 1 : -1));
+      return points.sort((a, b) => (a.id > b.id ? 1 : -1));
     case `sorting-time`:
-      return initialTasks.sort((a, b) =>
+      return points.sort((a, b) =>
         moment(a.timeStart) - moment(a.timeEnd) > moment(b.timeStart) - moment(b.timeEnd) ? 1 : -1
       );
     case `sorting-price`:
-      return initialTasks.sort((a, b) => (fullprice(a) > fullprice(b) ? 1 : -1));
+      return points.sort((a, b) => (fullprice(a) > fullprice(b) ? 1 : -1));
     default:
-      return initialTasks;
+      return points;
   }
 }
 
@@ -237,16 +235,18 @@ function tasksRender(arr) {
     for (let i = 0; i < arr.length; i++) {
       let point = arr[i];
 
-      let tripPoint = new TripPoint({
-        ...point, // eslint-disable-line
-        destinations: destinations,
-        newOffers: offers,
-      });
-      let tripPointEdit = new TripPointEdit({
-        ...point,
-        destinations: destinations,
-        newOffers: offers,
-      });
+      let tripPoint = new TripPoint(
+          _.assignIn(
+              point,
+              {destinations},
+              {newOffers: offers})
+      );
+      let tripPointEdit = new TripPointEdit(
+          _.assignIn(
+              point,
+              {destinations},
+              {newOffers: offers})
+      );
       TripPointsList.appendChild(tripPoint.render());
 
       tripPoint.onEdit = () => {
@@ -266,31 +266,29 @@ function tasksRender(arr) {
         point.price = newObject.price;
         point.isFavorite = newObject.isFavorite;
         provider
-          .updateTask({ id: point.id, data: point.toRAW() })
+          .updateTask({id: point.id, data: point.toRAW()})
           .catch(() => tripPointEdit.apiError())
           .then((newTask) => {
-            console.log(newTask);
             tripPoint.update(newTask);
             tripPoint.render();
             TripPointsList.replaceChild(tripPoint.element, tripPointEdit.element);
             tripPointEdit.unrender();
-            totalCostHandler(arr)
+            totalCostHandler(arr);
           });
       };
 
       tripPointEdit.onDelete = () => {
         provider.deleteTask(point)
-          .catch(()=>tripPointEdit.apiError())
+          .catch(() => tripPointEdit.apiError())
           .then(() => provider.getTasks())
-          .then((tasks)=> tasksRender(tasks))
+          .then((tasks) => tasksRender(tasks))
           .catch(alert);
       };
     }
   }
 }
 
-window.onload = function() {
+window.onload = function () {
   filtersRender(DB.FILTERS_DATA);
   sortRender(DB.SORT_DATA);
-  // tasksRender(initialTasks);
 };
