@@ -44,36 +44,36 @@ export class TripPointEdit extends Component {
     this._element.querySelector(`#destination`)
       .addEventListener(`change`, this._destinationChangeHandler.bind(this));
 
-
-    // Date Input
     flatpickr(this._element.querySelector(`.point__date .point__input`),
         {
-          dateFormat: `m d`,
-          mode: `range`,
-          defaultDate: moment(this._timeStart).format(`MM DD`),
+          altInput: true,
+          altFormat: `j F`,
+          dateFormat: `j F Y`
+        });
+    flatpickr(this._element.querySelector(`.point__time .date__start`),
+        {
+          enableTime: true,
+          noCalendar: false,
+          altInput: true,
+          [`time_24hr`]: true,
+          altFormat: `H:i`,
+          dateFormat: `Y-m-d H:i`,
+          onClose: (dateObj) => {
+            this._timeStart = Date.parse(dateObj);
+            this.reRender();
+          }
+        });
+    flatpickr(this._element.querySelector(`.point__time .date__end`),
+        {
+          enableTime: true,
+          [`time_24hr`]: true,
+          noCalendar: false,
+          minDate: this._timeStart,
+          altInput: true,
+          altFormat: `H:i`,
+          dateFormat: `Y-m-d H:i`,
         });
 
-    // Time Range
-    flatpickr(
-        this._element.querySelector(`.point__time .point__input`),
-        {
-          locale: {
-            rangeSeparator: ` — `,
-          },
-          enableTime: true,
-          dateFormat: `H:i`,
-          mode: `range`,
-          // eslint-disable-next-line
-          [`time_24hr`]: true,
-          defaultDate: [moment(this._timeStart).format(`HH:mm YYYY MM DD`),
-            moment(this._timeEnd).format(`HH:mm YYYY MM DD`)],
-          minuteIncrement: 10,
-          onClose: (dateObj) => {
-            this._timeStart = dateObj[0];
-            this._timeEnd = dateObj[1];
-            this.reRender();
-          },
-        });
   }
 
   set onDelete(fn) {
@@ -236,8 +236,14 @@ export class TripPointEdit extends Component {
     return {
       id: (value) => (target.id = value),
       destination: (value) => (target.title = value),
-      timeStart: (value) => (target.timeStart = moment(value).unix() * 1000),
-      timeEnd: (value) => (target.timeEnd = moment(value).unix() * 1000),
+      timeStart: (value) => {
+        target.timeStart = value ? Date.parse(moment(value, `YYYY-MM-DD HH:mm`).toDate())
+          : ``;
+      },
+      timeEnd: (value) => {
+        target.timeEnd = value ? Date.parse(moment(value, `YYYY-MM-DD HH:mm`).toDate())
+          : ``;
+      },
       price: (value) => (target.price = value),
       iconText: (value) => (target.icon = value),
       favorite: (value) => (target.isFavorite = value),
@@ -353,12 +359,11 @@ export class TripPointEdit extends Component {
                 </datalist>
               </div>
 
-              <label class="point__time">
-                choose time
-                <input class="point__input" type="text" value="00:00 — 00:00" name="time" placeholder="00:00 — 00:00">
-                <input type="hidden" name="timeStart" value="${moment(this._timeStart).format()}">
-                <input type="hidden" name="timeEnd" value="${moment(this._timeEnd).format()}">
-              </label>
+             <label class="point__time">
+                    choose time
+                    <input class="point__input date__start" type="text"  value="${moment(this._timeStart).format(`YYYY-MM-DD HH:mm`)}" name="timeStart" placeholder="${moment(this._timeStart).format(`HH:mm`)}">
+                    <input class="point__input date__end" type="text"  value="${moment(this._timeEnd).format(`YYYY-MM-DD HH:mm`)}" name="timeEnd" placeholder="${moment(this._timeEnd).format(`HH:mm`)}">
+                  </label>
 
               <label class="point__price">
                 write price
