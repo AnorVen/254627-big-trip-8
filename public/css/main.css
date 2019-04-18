@@ -387,6 +387,11 @@ input[type=radio]:checked + .trip-sorting__item {
   box-shadow: 0 11px 20px 0 rgba(0,0,0,0.22);
   margin-bottom: 60px;
 }
+.point > .point{
+  padding: 0;
+  margin-bottom: 0;
+  box-shadow: none;
+}
 .point__header {
   display: flex;
   align-items: center;
@@ -632,3 +637,4 @@ input[type=radio]:checked + .trip-sorting__item {
   margin-bottom: 95px;
   width: 900px;
 }
+

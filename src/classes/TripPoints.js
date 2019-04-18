@@ -101,8 +101,16 @@ export class TripPoint extends Component {
   _timeSectionRender(timeStart, timeEnd) {
     let timeStartTemp = moment(timeStart).format(`HH:mm`);
     let timeEndTemp = moment(timeEnd).format(`HH:mm`);
-    let timeShiftTemp = moment.duration(moment(timeEnd).diff(moment(timeStart))).format(`h[h]: mm[m]`);
+    let timeShiftTemp = moment.duration(moment(timeEnd).diff(moment(timeStart)));
+    let timeShiftTempRender = `00H:00M`;
+    if (timeShiftTemp._data.days > 0) {
+      timeShiftTempRender = timeShiftTemp.format(`dd[D] h[h]:mm[m]`);
+    } else if (timeShiftTemp._data.hours > 0) {
+      timeShiftTempRender = timeShiftTemp.format(`h[h]:mm[m]`);
+    } else {
+      timeShiftTempRender = timeShiftTemp.format(`mm[m]`);
+    }
     return `<span class="trip-point__timetable">${timeStartTemp} &nbsp;&mdash; ${timeEndTemp}</span>
-            <span class="trip-point__duration">${timeShiftTemp}</span>`;
+            <span class="trip-point__duration">${timeShiftTempRender}</span>`;
   }
 }
