@@ -23,10 +23,8 @@ export class TripPointEdit extends Component {
     this._destinationDesc = this._destination.description;
     this._destinationTitle = this._destination.name;
 
-
     this._newOffers = newOffers;
     this._destinations = destinations;
-
 
     this._onDelete = null;
     this.apiError = this.apiError.bind(this);
@@ -167,7 +165,6 @@ export class TripPointEdit extends Component {
   }
 
   _partialUpdate() {
-
     this._element.innerHTML = this.template;
   }
 
@@ -400,6 +397,7 @@ export class TripPointEdit extends Component {
               <input type="hidden" class="point__total-price" name="total-price" value="">
             </section>
           </form>
+          </div>
         </article>`.trim());
   }
 
