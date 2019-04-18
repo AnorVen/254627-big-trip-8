@@ -83,57 +83,56 @@ TripPointsList.innerHTML = `Loading route...`;
 NewPiont.addEventListener(`click`, newPointHandler);
 
 function newPointHandler() {
-  if (newPointOpen) {
-    return null;
+  if (!newPointOpen) {
+    newPointOpen = true;
+    let newPointEdit = new TripPointEdit(
+        _.assignIn(
+            ModelPoint.parseTask(DB.NEW_POINT),
+            {id: initialTasks.length},
+            {destinations},
+            {newOffers: offers})
+    );
+    TripPointsList.insertBefore(newPointEdit.render(), TripPointsList.children[0]);
+    let point = ModelPoint.parseTask(DB.NEW_POINT);
+
+    newPointEdit.onSubmit = (newObject) => {
+      if (
+        newObject.title === DB.NEW_POINT.destination.name ||
+        newObject.price === 0 ||
+        newObject.timeStart === newObject.timeEnd
+      ) {
+        newPointEdit.apiError();
+        return;
+      }
+
+      point.id = newObject.id;
+      point.destination.name = newObject.title;
+      point.title = newObject.title;
+      point.icon = newObject.icon;
+      point.offers = [...newObject.offers.values()];
+      point.timeStart = newObject.timeStart;
+      point.timeEnd = newObject.timeEnd;
+      point.price = newObject.price;
+      point.isFavorite = newObject.isFavorite;
+
+      provider
+        .createTask({point: point.toRAW()})
+        .catch(() => newPointEdit.apiError())
+        .then(() => provider.getTasks())
+        .then((points) => tasksRender(points))
+        .catch((err) => {
+          TripPointsList.innerHTML = `Something went wrong while loading your route info. Check your connection or try again later. fetch error: ${err}`;
+          throw err;
+        });
+      newPointOpen = false;
+    };
+
+    newPointEdit.onDelete = () => {
+      TripPointsList.removeChild(newPointEdit.element);
+      newPointEdit.unrender();
+      newPointOpen = false;
+    };
   }
-  newPointOpen = true;
-  let newPointEdit = new TripPointEdit(
-      _.assignIn(
-          ModelPoint.parseTask(DB.NEW_POINT),
-          {id: initialTasks.length},
-          {destinations},
-          {newOffers: offers})
-  );
-  TripPointsList.insertBefore(newPointEdit.render(), TripPointsList.children[0]);
-  let point = ModelPoint.parseTask(DB.NEW_POINT);
-
-  newPointEdit.onSubmit = (newObject) => {
-    if (
-      newObject.title === DB.NEW_POINT.destination.name ||
-      newObject.price === 0 ||
-      newObject.timeStart === newObject.timeEnd
-    ) {
-      newPointEdit.apiError();
-      return;
-    }
-
-    point.id = newObject.id;
-    point.destination.name = newObject.title;
-    point.title = newObject.title;
-    point.icon = newObject.icon;
-    point.offers = [...newObject.offers.values()];
-    point.timeStart = newObject.timeStart;
-    point.timeEnd = newObject.timeEnd;
-    point.price = newObject.price;
-    point.isFavorite = newObject.isFavorite;
-
-    provider
-      .createTask({point: point.toRAW()})
-      .catch(() => newPointEdit.apiError())
-      .then(() => provider.getTasks())
-      .then((points) => tasksRender(points))
-      .catch((err) => {
-        TripPointsList.innerHTML = `Something went wrong while loading your route info. Check your connection or try again later. fetch error: ${err}`;
-        throw err;
-      });
-    newPointOpen = false;
-  };
-
-  newPointEdit.onDelete = () => {
-    TripPointsList.removeChild(newPointEdit.element);
-    newPointEdit.unrender();
-    newPointOpen = false;
-  };
 }
 
 Statistic.addEventListener(`click`, statisticClickHandler);
@@ -246,14 +245,12 @@ function tasksRender(arr) {
           _.assignIn(
               point,
               {destinations},
-              {newOffers: offers})
-      );
+              {newOffers: offers}));
       let tripPointEdit = new TripPointEdit(
           _.assignIn(
               point,
               {destinations},
-              {newOffers: offers})
-      );
+              {newOffers: offers}));
       TripPointsList.appendChild(tripPoint.render());
 
       tripPoint.onEdit = () => {
