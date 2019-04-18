@@ -3,6 +3,7 @@ import moment from 'moment';
 import momentDurationFormatSetup from 'moment-duration-format'; // без этого не запускается плагин для момента
 import Component from './Component';
 import {POINT_VARIABLES} from '../Database';
+momentDurationFormatSetup(moment);
 export class TripPoint extends Component {
   constructor({id, icon, offers = [], timeStart, timeEnd, price, isFavorite, title, newOffers}) {
     super();
@@ -21,7 +22,6 @@ export class TripPoint extends Component {
     this._newOffers = newOffers;
     this.fullPrice = this.fullPrice.bind(this);
     this.offersPrice = this.offersPrice.bind(this);
-    this.momentDurationFormatSetup = momentDurationFormatSetup; // без этого не пропускает валидатор при автопроверке
   }
   bind() {
     this._element.addEventListener(`click`, this._onEditButtonClick.bind(this));

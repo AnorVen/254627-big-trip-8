@@ -31,6 +31,7 @@ let destinations = [];
 let offers = [];
 const escKeyKode = 27;
 let initialTasks = [];
+let newPointOpen = false;
 window.addEventListener(`offline`, () => (document.title = `${document.title}[OFFLINE]`));
 window.addEventListener(`online`, () => {
   document.title = document.title.split(`[OFFLINE]`)[0];
@@ -82,6 +83,10 @@ TripPointsList.innerHTML = `Loading route...`;
 NewPiont.addEventListener(`click`, newPointHandler);
 
 function newPointHandler() {
+  if (newPointOpen) {
+    return null;
+  }
+  newPointOpen = true;
   let newPointEdit = new TripPointEdit(
       _.assignIn(
           ModelPoint.parseTask(DB.NEW_POINT),
@@ -121,11 +126,13 @@ function newPointHandler() {
         TripPointsList.innerHTML = `Something went wrong while loading your route info. Check your connection or try again later. fetch error: ${err}`;
         throw err;
       });
+    newPointOpen = false;
   };
 
   newPointEdit.onDelete = () => {
     TripPointsList.removeChild(newPointEdit.element);
     newPointEdit.unrender();
+    newPointOpen = false;
   };
 }
 

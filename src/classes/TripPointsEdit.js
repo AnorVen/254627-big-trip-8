@@ -167,6 +167,7 @@ export class TripPointEdit extends Component {
   }
 
   _partialUpdate() {
+
     this._element.innerHTML = this.template;
   }
 
