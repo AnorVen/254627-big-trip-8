@@ -217,7 +217,7 @@ function sortTasks(points, target) {
         moment(a.timeStart) - moment(a.timeEnd) > moment(b.timeStart) - moment(b.timeEnd) ? 1 : -1
       );
     case `sorting-price`:
-      return points.sort((a, b) => (fullprice(a) > fullprice(b) ? 1 : -1));
+      return points.sort((a, b) => fullprice(a) < fullprice(b) ? 1 : -1);
     default:
       return points;
   }

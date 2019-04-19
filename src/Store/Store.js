@@ -25,11 +25,7 @@ export const Store = class {
 
   getAll() {
     const emptyItems = {};
-    const items = this._storage.getItem(this._storeKey);
-    if (!items) {
-      return emptyItems;
-    }
-
+    const items = this._storage.getItem(this._storeKey) || emptyItems;
     try {
       return JSON.parse(items);
     } catch (e) {

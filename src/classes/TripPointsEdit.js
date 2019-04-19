@@ -107,8 +107,6 @@ export class TripPointEdit extends Component {
   _destinationChangeHandler(evt) {
     if (this._destinations.some((item) => item.name === evt.target.value)) {
       this._destination = this._destinations.filter((item) => item.name === evt.target.value)[0];
-    } else {
-      this._destination = this._destination;
     }
     this._pictures = this._destination.pictures;
     this._destinationDesc = this._destination.description;
@@ -146,12 +144,8 @@ export class TripPointEdit extends Component {
       let target = evt.target.value;
       if (this._newOffers.some((item) => item.type === target)) {
         let newOffer = this._newOffers.filter((item) => item.type === target)[0];
-        if (newOffer.type === this._icon) {
-          // TODO если в офферах приходящих с сервера есть офферы с таким же названием, как изначальные офферы - то происходит задвоение.. и надо или фильтровать все офферы на непоыторяемость по тайтлу, или просто перетирать офферы пришедшие в пойнте с сервера...
-          this._state.offers = newOffer.offers.concat(this._offers);
-        } else {
-          this._state.offers = newOffer.offers;
-        }
+        this._state.offers = newOffer.type === this._icon ?
+          newOffer.offers.concat(this._offers) : newOffer.offers;
         this._state.icon = newOffer.type;
       }
       this.reRender();
