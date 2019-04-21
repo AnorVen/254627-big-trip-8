@@ -22,10 +22,6 @@ export default class Component {
   unbind() {
   }
 
-  setState(newState) {
-    this._state = newState;
-  }
-
   createElement(template) {
     const newElement = document.createElement(`div`);
     newElement.innerHTML = template;

@@ -27,7 +27,7 @@ export class TripPointEdit extends Component {
     this._destinations = destinations;
 
     this._onDelete = null;
-    this.apiError = this.apiError.bind(this);
+    this.handleApiError = this.handleApiError.bind(this);
   }
 
   bind() {
@@ -80,7 +80,7 @@ export class TripPointEdit extends Component {
     this._onDelete = fn;
   }
 
-  apiError() {
+  handleApiError() {
     this._element.classList.add(`shake`);
   }
 
@@ -88,20 +88,20 @@ export class TripPointEdit extends Component {
   _onResetButtonClick(evt) {
     evt.preventDefault();
     this._element.classList.remove(`shake`);
-    let btnDell = evt.target
+    let buttonReset = evt.target
       .querySelector(`.point__buttons button.point__button[type="reset"]`);
-    let btnSave = evt.target
+    let buttonSave = evt.target
       .querySelector(`.point__buttons button.point__button[type="submit"]`);
-    btnDell.disabled = true;
-    btnSave.disabled = true;
-    btnDell.innerHTML = `Deleting...`;
+    buttonReset.disabled = true;
+    buttonSave.disabled = true;
+    buttonReset.innerHTML = `Deleting...`;
     if (typeof this._onDelete === `function`) {
       this._onDelete();
     }
 
-    btnDell.innerHTML = `Delete`;
-    btnDell.disabled = false;
-    btnSave.disabled = false;
+    buttonReset.innerHTML = `Delete`;
+    buttonReset.disabled = false;
+    buttonSave.disabled = false;
   }
 
   _destinationChangeHandler(evt) {
@@ -184,22 +184,22 @@ export class TripPointEdit extends Component {
   _onSaveButtonClick(evt) {
     evt.preventDefault();
     this._element.classList.remove(`shake`);
-    let btnSave = evt.target
+    let buttonSave = evt.target
       .querySelector(`.point__buttons button.point__button[type="submit"]`);
-    let btnDell = evt.target
+    let buttonReset = evt.target
       .querySelector(`.point__buttons button.point__button[type="reset"]`);
-    btnSave.disabled = true;
-    btnDell.disabled = true;
-    btnSave.innerHTML = `Saving...`;
+    buttonSave.disabled = true;
+    buttonReset.disabled = true;
+    buttonSave.innerHTML = `Saving...`;
     const formData = new FormData(this._element.querySelector(`.tripPointForm`));
     const newData = this._processForm(formData);
     if (typeof this._onSubmit === `function`) {
       this._onSubmit(newData);
     }
     this.update(newData);
-    btnSave.innerHTML = `Save`;
-    btnSave.disabled = false;
-    btnDell.disabled = false;
+    buttonSave.innerHTML = `Save`;
+    buttonSave.disabled = false;
+    buttonReset.disabled = false;
   }
 
   _processForm(formData) {
@@ -221,7 +221,6 @@ export class TripPointEdit extends Component {
         TripPointEditMapper[property](value);
       }
     }
-
     return entry;
   }
 
@@ -246,12 +245,6 @@ export class TripPointEdit extends Component {
           item.accepted = true;
         }
       })),
-
-      /*
-       этот вариант по непонятным для меня причинам не работает
-       offer: (value) => (target.offers.filter((item) => (
-          item.title === value
-        )).accepted = true),*/
     };
   }
 
@@ -381,7 +374,7 @@ export class TripPointEdit extends Component {
                 <h3 class="point__details-title">offers</h3>
 
                 <div class="point__offers-wrap">
-                  ${this._offerRender(this._state.offers)}
+                  ${this._renderOffer(this._state.offers)}
                 </div>
 
               </section>
@@ -401,7 +394,7 @@ export class TripPointEdit extends Component {
   }
 
 
-  _offerRender(arr) {
+  _renderOffer(arr) {
     return arr.map((item) => (
       `<input class="point__offers-input visually-hidden" 
           type="checkbox" 

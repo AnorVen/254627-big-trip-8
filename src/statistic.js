@@ -2,50 +2,49 @@ import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import {POINT_VARIABLES} from './Database';
 import moment from 'moment';
+const BAR_HEIGHT = 30;
 
-function offersPrice(point) {
+function calculateOffersPrice(point) {
   let offersPriceTemp = 0;
   let arr = Object.keys(point.offers);
-  for (let i = 0; i < arr.length; i++) {
-    if (point.offers[arr[i]].isChecked) {
-      offersPriceTemp += point.offers[arr[i]].price;
+  for (let key of arr) {
+    if (point.offers[key].isChecked) {
+      offersPriceTemp += point.offers[key].price;
     }
   }
   return offersPriceTemp;
 
 }
 
-export function chartConteiner(points) {
+export function renderChartContainer(points) {
   document.querySelector(`.statistic__item--money`)
     .innerHTML = `<canvas class="statistic__money" width="900"></canvas>`;
   document.querySelector(`.statistic__item--transport`)
     .innerHTML = `<canvas class="statistic__transport" width="900"></canvas>`;
   document.querySelector(`.statistic__item--time-spend`)
     .innerHTML = `<canvas class="statistic__time-spend" width="900"></canvas>`;
-
-  const moneyCtx = document.querySelector(`.statistic__money`);
-  const transportCtx = document.querySelector(`.statistic__transport`);
-  const timeSpendCtx = document.querySelector(`.statistic__time-spend`);
-
+  handlePointForStatic(points);
+}
+function handlePointForStatic(points) {
   let tempDataIcon = {};
   let labelPoint = [];
   let pricePoint = [];
   let quantityIcon = [];
   let timeShift = [];
 
-  for (let i = 0; i < points.length; i++) {
-    let temp = points[i].icon;
+  for (let point of points) {
+    let temp = point.icon;
     if (tempDataIcon[temp]) {
       tempDataIcon[temp].quantity += 1;
-      tempDataIcon[temp].price += +points[i].price + +offersPrice(points[i]);
-      tempDataIcon[temp].timeShift += moment(points[i].timeEnd) - moment(points[i].timeStart);
+      tempDataIcon[temp].price += +point.price + +calculateOffersPrice(point);
+      tempDataIcon[temp].timeShift += moment(point.timeEnd) - moment(point.timeStart);
     } else {
       tempDataIcon[temp] = {};
-      tempDataIcon[temp].icon = `${POINT_VARIABLES.icon[points[i].icon
-        .toLowerCase().split(`-`).join(``)]}${points[i].icon.toUpperCase()}`;
-      tempDataIcon[temp].price = +points[i].price + +offersPrice(points[i]);
+      tempDataIcon[temp].icon = `${POINT_VARIABLES.icon[point.icon
+        .toLowerCase().split(`-`).join(``)]}${point.icon.toUpperCase()}`;
+      tempDataIcon[temp].price = +point.price + +calculateOffersPrice(point);
       tempDataIcon[temp].quantity = 1;
-      tempDataIcon[temp].timeShift = moment(points[i].timeEnd) - moment(points[i].timeStart);
+      tempDataIcon[temp].timeShift = moment(point.timeEnd) - moment(point.timeStart);
     }
   }
 
@@ -55,12 +54,17 @@ export function chartConteiner(points) {
       pricePoint.push(tempDataIcon[key].price);
       quantityIcon.push(tempDataIcon[key].quantity);
       timeShift.push(Math.floor(tempDataIcon[key].timeShift / (60 * 1000 * 60)));
-
     }
   }
+  renderCanvases(points, labelPoint, pricePoint, quantityIcon, timeShift);
+}
 
-  // Рассчитаем высоту канваса в зависимости от того, сколько данных в него будет передаваться
-  const BAR_HEIGHT = 20;
+
+function renderCanvases(points, labelPoint, pricePoint, quantityIcon, timeShift) {
+  const moneyCtx = document.querySelector(`.statistic__money`);
+  const transportCtx = document.querySelector(`.statistic__transport`);
+  const timeSpendCtx = document.querySelector(`.statistic__time-spend`);
+
   moneyCtx.height = BAR_HEIGHT * points.length;
   transportCtx.height = BAR_HEIGHT * points.length;
   timeSpendCtx.height = BAR_HEIGHT * points.length;
@@ -259,5 +263,4 @@ export function chartConteiner(points) {
     }
   });
   return [moneyChart, transportChart, timeSpendChart];
-
 }

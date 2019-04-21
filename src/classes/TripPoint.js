@@ -20,8 +20,8 @@ export class TripPoint extends Component {
     this._state.price = price;
     this._state.offers = offers;
     this._newOffers = newOffers;
-    this.fullPrice = this.fullPrice.bind(this);
-    this.offersPrice = this.offersPrice.bind(this);
+    this.calculateFullPrice = this.calculateFullPrice.bind(this);
+    this.calculateOffersPrice = this.calculateOffersPrice.bind(this);
   }
   bind() {
     this._element.addEventListener(`click`, this._onEditButtonClick.bind(this));
@@ -60,19 +60,19 @@ export class TripPoint extends Component {
     <input type="hidden" class="visually-hidden" value="${this._id}">
     <h3 class="trip-point__title" >${this._icon} to ${this._title}</h3>
     <p class="trip-point__schedule" >
-      ${this._timeSectionRender(this._timeStart, this._timeEnd)}
+      ${this._renderTimeSection(this._timeStart, this._timeEnd)}
     </p>
-    <p  class = "trip-point__price" > &euro; &nbsp; ${this.fullPrice()}</p>
-    ${this._offerRender(this._offers)}</article>`.trim());
+    <p  class = "trip-point__price" > &euro; &nbsp; ${this.calculateFullPrice()}</p>
+    ${this._renderOffers(this._offers)}</article>`.trim());
   }
 
-  _offerRender(arr) {
-    let fileteredOffers = arr.filter((item)=>(item.accepted));
-    if (fileteredOffers.length > 2) {
-      fileteredOffers = [fileteredOffers[0], fileteredOffers[1]];
+  _renderOffers(arr) {
+    let filteredOffers = arr.filter((item)=>(item.accepted));
+    if (filteredOffers.length > 2) {
+      filteredOffers = [filteredOffers[0], filteredOffers[1]];
     }
     let tempHTML = `<ul class="trip-point__offers">`;
-    tempHTML += fileteredOffers.map((item)=>(
+    tempHTML += filteredOffers.map((item)=>(
       `<li><button class="trip-point__offer">${item.title} + €${item.price}</button></li>`.trim()
     )).join(``);
     tempHTML += `</ul>`;
@@ -80,7 +80,7 @@ export class TripPoint extends Component {
   }
 
 
-  offersPrice() {
+  calculateOffersPrice() {
     if (this._state.offers) {
       return this._state.offers.filter((item)=>(item.accepted))
         .reduce((acc, offer) => {
@@ -90,15 +90,15 @@ export class TripPoint extends Component {
     return 0;
   }
 
-  fullPrice() {
+  calculateFullPrice() {
     if (this._state.offers) {
-      return parseInt(this._state.price, 10) + this.offersPrice();
+      return parseInt(this._state.price, 10) + this.calculateOffersPrice();
     }
     return this._state.price;
 
   }
 
-  _timeSectionRender(timeStart, timeEnd) {
+  _renderTimeSection(timeStart, timeEnd) {
     let timeStartTemp = moment(timeStart).format(`HH:mm`);
     let timeEndTemp = moment(timeEnd).format(`HH:mm`);
     let timeShiftTemp = moment.duration(moment(timeEnd).diff(moment(timeStart)));

@@ -24,13 +24,12 @@ export const Store = class {
   }
 
   getAll() {
-    const emptyItems = {};
-    const items = this._storage.getItem(this._storeKey) || emptyItems;
+    const items = this._storage.getItem(this._storeKey) || {};
     try {
       return JSON.parse(items);
     } catch (e) {
       alert(`Error parse items. Error: ${e}. Items: ${items}`); // eslint-disable-line
-      return emptyItems;
+      return {};
     }
   }
 };
