@@ -1,6 +1,6 @@
 import Component from './Component';
 
-export class ButtonSort extends Component {
+class ButtonSort extends Component {
   constructor({title, checked = false}) {
     super();
     this._title = title;
@@ -22,10 +22,11 @@ export class ButtonSort extends Component {
            name="trip-sorting" 
            id="sorting-${this._title.toLowerCase()}" 
            value="${this._title.toLowerCase()}"  
-           ${this._checked ? `checked` : null}>
+           ${this._checked ? `checked` : ``}>
               <label class="trip-sorting__item trip-sorting__item--${this._title.toLowerCase()}"
                 for="sorting-${this._title.toLowerCase()}">${this._title}</label>
             </span>`.trim();
     }
   }
 }
+export default ButtonSort;

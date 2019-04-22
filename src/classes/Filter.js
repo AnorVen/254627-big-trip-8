@@ -1,5 +1,5 @@
 import Component from './Component';
-export class Filter extends Component {
+class Filter extends Component {
   constructor({title, checked = false}) {
     super();
     this._title = title;
@@ -17,7 +17,8 @@ export class Filter extends Component {
         <input type="radio" 
           id="filter-${this._title.toLowerCase()}" 
           name="filter" value="${this._title.toLowerCase()}" 
-          ${this._checked ? `checked` : null}>
+          ${this._checked ? `checked` : ``}>
         ${this._title}</label>`.trim());
   }
 }
+export default Filter;

@@ -1,4 +1,4 @@
-export const Store = class {
+const Store = class {
   constructor({key, storage}) {
     this._storage = storage;
     this._storeKey = key;
@@ -19,7 +19,6 @@ export const Store = class {
   removeItem({key}) {
     const items = this.getAll();
     delete items[key];
-
     this._storage.setItem(this._storeKey, JSON.stringify(items));
   }
 
@@ -33,3 +32,4 @@ export const Store = class {
     }
   }
 };
+export default Store;

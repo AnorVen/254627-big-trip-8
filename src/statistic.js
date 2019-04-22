@@ -16,7 +16,7 @@ function calculateOffersPrice(point) {
 
 }
 
-export function renderChartContainer(points) {
+export default function renderChartContainer(points) {
   document.querySelector(`.statistic__item--money`)
     .innerHTML = `<canvas class="statistic__money" width="900"></canvas>`;
   document.querySelector(`.statistic__item--transport`)
@@ -61,15 +61,15 @@ function handlePointForStatic(points) {
 
 
 function renderCanvases(points, labelPoint, pricePoint, quantityIcon, timeShift) {
-  const moneyCtx = document.querySelector(`.statistic__money`);
-  const transportCtx = document.querySelector(`.statistic__transport`);
-  const timeSpendCtx = document.querySelector(`.statistic__time-spend`);
+  const moneyCtxElement = document.querySelector(`.statistic__money`);
+  const transportCtxElement = document.querySelector(`.statistic__transport`);
+  const timeSpendCtxElement = document.querySelector(`.statistic__time-spend`);
 
-  moneyCtx.height = BAR_HEIGHT * points.length;
-  transportCtx.height = BAR_HEIGHT * points.length;
-  timeSpendCtx.height = BAR_HEIGHT * points.length;
+  moneyCtxElement.height = points.length > 7 ? BAR_HEIGHT * points.length : BAR_HEIGHT * 10;
+  transportCtxElement.height = points.length > 7 ? BAR_HEIGHT * points.length : BAR_HEIGHT * 10;
+  timeSpendCtxElement.height = points.length > 7 ? BAR_HEIGHT * points.length : BAR_HEIGHT * 10;
 
-  const moneyChart = new Chart(moneyCtx, {
+  const moneyChart = new Chart(moneyCtxElement, {
     plugins: [ChartDataLabels],
     type: `horizontalBar`,
     data: {
@@ -134,7 +134,7 @@ function renderCanvases(points, labelPoint, pricePoint, quantityIcon, timeShift)
     }
   });
 
-  const transportChart = new Chart(transportCtx, {
+  const transportChart = new Chart(transportCtxElement, {
     plugins: [ChartDataLabels],
     type: `horizontalBar`,
     data: {
@@ -198,7 +198,7 @@ function renderCanvases(points, labelPoint, pricePoint, quantityIcon, timeShift)
       }
     }
   });
-  const timeSpendChart = new Chart(timeSpendCtx, {
+  const timeSpendChart = new Chart(timeSpendCtxElement, {
     plugins: [ChartDataLabels],
     type: `horizontalBar`,
     data: {

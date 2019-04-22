@@ -6,7 +6,7 @@ const objectToArray = (object) => {
   return Object.keys(object).map((id) => object[id]);
 };
 
-export const Provider = class {
+const Provider = class {
   constructor({api, store, generateId}) {
     this._api = api;
     this._store = store;
@@ -14,7 +14,7 @@ export const Provider = class {
   }
 
   updateTask({id, data}) {
-    if (this._isOnline()) {
+    if (Provider._isOnline()) {
       return this._api.updateTask({id, data})
         .then((task) => {
           this._store.setItem({key: task.id, item: task.toRAW()});
@@ -29,7 +29,7 @@ export const Provider = class {
   }
 
   createTask({point}) {
-    if (this._isOnline()) {
+    if (Provider._isOnline()) {
       return this._api.createTask({point})
         .then((data) => {
           this._store.setItem({key: data.id, item: data.toRAW()});
@@ -45,7 +45,7 @@ export const Provider = class {
   }
 
   deleteTask({id}) {
-    if (this._isOnline()) {
+    if (Provider._isOnline()) {
       return this._api.deleteTask({id})
         .then(() => {
           this._store.removeItem({key: id});
@@ -58,7 +58,7 @@ export const Provider = class {
   }
 
   getTasks() {
-    if (this._isOnline()) {
+    if (Provider._isOnline()) {
       return this._api.getTasks()
         .then((tasks) => {
           tasks.map((it) => this._store.setItem({key: it.id, item: it.toRAW()}));
@@ -73,7 +73,7 @@ export const Provider = class {
     }
   }
 
-  _isOnline() {
+  static _isOnline() {
     return window.navigator.onLine;
   }
 
@@ -82,7 +82,7 @@ export const Provider = class {
   }
 
   getOffers() {
-    if (this._isOnline()) {
+    if (Provider._isOnline()) {
       return this._api.getOffers()
         .then((offers) => {
           this._store.setItem({key: `offers`, item: offers});
@@ -97,7 +97,7 @@ export const Provider = class {
   }
 
   getDestinations() {
-    if (this._isOnline()) {
+    if (Provider._isOnline()) {
       return this._api.getDestinations()
       .then((destinations) => {
         this._store.setItem({key: `destinations`, item: destinations});
@@ -111,3 +111,4 @@ export const Provider = class {
     }
   }
 };
+export default Provider;
