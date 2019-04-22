@@ -1,13 +1,13 @@
 export default class ModelPoint {
-  constructor(data) { // eslint-disable-line
+  constructor(data) {
     this.id = data[`id`];
     this.icon = data[`type`] || `bus`;
     this.title = data[`destination`][`name`] || ``;
-    this.timeStart = data[`date_from`] || Date.now(); // eslint-disable-line
-    this.timeEnd = data[`date_to`] || Date.now(); // eslint-disable-line
-    this.price = data[`base_price`] || 0; // eslint-disable-line
+    this.timeStart = data[`date_from`] || Date.now();
+    this.timeEnd = data[`date_to`] || Date.now();
+    this.price = data[`base_price`] || 0;
     this.offers = data[`offers`] || [];
-    this.isFavorite = data[`is_favorite`] || false; // eslint-disable-line
+    this.isFavorite = data[`is_favorite`] || false;
     this.destination = data[`destination`] || {description: ``, name: ``, pictures: []};
   }
 

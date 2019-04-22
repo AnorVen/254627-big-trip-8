@@ -1,3 +1,4 @@
+/*
 const CACHE_NAME = `Points`;
 self.addEventListener('install', (event) => {
   console.log(`sw, install`, {event});
@@ -49,3 +50,4 @@ self.addEventListener('fetch', (event) => {
         }
       }));
 });
+*/

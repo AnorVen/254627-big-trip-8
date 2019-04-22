@@ -20,7 +20,7 @@ const toJSON = (response) => {
 };
 
 
-export const API = class {
+const API = class {
   constructor({endPoint, authorization}) {
     this._endPoint = endPoint;
     this._authorization = authorization;
@@ -92,3 +92,4 @@ export const API = class {
       .then(toJSON);
   }
 };
+export default API;

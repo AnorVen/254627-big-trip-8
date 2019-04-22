@@ -22,18 +22,14 @@ export default class Component {
   unbind() {
   }
 
-  setState(newState) {
-    this._state = newState;
-  }
-
-  createElement(template) {
+  static createElement(template) {
     const newElement = document.createElement(`div`);
     newElement.innerHTML = template;
     return newElement.firstChild;
   }
 
   render() {
-    this._element = this.createElement(this.template);
+    this._element = Component.createElement(this.template);
     this.bind();
     return this._element;
   }
