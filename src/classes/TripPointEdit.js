@@ -28,9 +28,8 @@ class TripPointEdit extends Component {
 
     this._onDelete = null;
     this.handleApiError = this.handleApiError.bind(this);
-    this.flatpickrDate = {};
-    this.flatpickrTimeStart = {};
-    this.flatpickrTimeEnd = {};
+    this.flatpickrTimeStart = null;
+    this.flatpickrTimeEnd = null;
   }
 
   bind() {
@@ -58,7 +57,6 @@ class TripPointEdit extends Component {
           dateFormat: `Y-m-d H:i`,
           onClose: (dateObj) => {
             this._timeStart = Date.parse(dateObj);
-            this.flatpickrTimeStart.destroy();
             this._reRender();
           },
         });
@@ -73,7 +71,6 @@ class TripPointEdit extends Component {
           dateFormat: `Y-m-d H:i`,
           onClose: (dateObj) => {
             this._timeEnd = Date.parse(dateObj);
-            this.flatpickrTimeEnd.destroy();
             this._reRender();
           },
         });
@@ -94,6 +91,8 @@ class TripPointEdit extends Component {
       .removeEventListener(`change`, this._destinationChangeHandler.bind(this));
     this._element.querySelector(`.point__price .point__input`)
       .removeEventListener(`change`, this._onPriceHandler.bind(this));
+    this.flatpickrTimeStart.destroy();
+    this.flatpickrTimeEnd.destroy();
   }
 
 
