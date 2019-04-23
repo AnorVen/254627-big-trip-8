@@ -57,7 +57,6 @@ class TripPointEdit extends Component {
           dateFormat: `Y-m-d H:i`,
           onClose: (dateObj) => {
             this._timeStart = Date.parse(dateObj);
-            this._reRender();
           },
         });
     this.flatpickrTimeEnd = flatpickr(this._element.querySelector(`.point__time .date__end`),
@@ -65,13 +64,11 @@ class TripPointEdit extends Component {
           enableTime: true,
           [`time_24hr`]: true,
           noCalendar: false,
-          minDate: this._timeStart,
           altInput: true,
           altFormat: `H:i`,
           dateFormat: `Y-m-d H:i`,
           onClose: (dateObj) => {
             this._timeEnd = Date.parse(dateObj);
-            this._reRender();
           },
         });
   }
@@ -422,8 +419,8 @@ class TripPointEdit extends Component {
     this._icon = data.icon;
     this._state.icon = data.icon;
     this._title = data.title;
-    this._timeStart = data.timeStart;
-    this._timeEnd = data.timeEnd;
+    this._timeStart = data.timeStart < data.timeEnd ? data.timeStart : data.timeEnd;
+    this._timeEnd = data.timeStart < data.timeEnd ? data.timeEnd : data.timeStart;
     this._price = data.price;
     this._offers = data.offers;
     this._state.offers = data.offers;

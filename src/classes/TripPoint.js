@@ -10,8 +10,8 @@ class TripPoint extends Component {
     this._id = id;
     this._icon = icon;
     this._title = title;
-    this._timeStart = timeStart;
-    this._timeEnd = timeEnd;
+    this._timeStart = timeStart < timeEnd ? timeStart : timeEnd;
+    this._timeEnd = timeStart < timeEnd ? timeEnd : timeStart;
     this._offers = offers;
     this._isFavorite = Boolean(isFavorite);
     this._element = null;
@@ -40,8 +40,8 @@ class TripPoint extends Component {
     this._id = data.id;
     this._icon = data.icon;
     this._title = data.title;
-    this._timeStart = data.timeStart;
-    this._timeEnd = data.timeEnd;
+    this._timeStart = data.timeStart < data.timeEnd ? data.timeStart : data.timeEnd;
+    this._timeEnd = data.timeStart < data.timeEnd ? data.timeEnd : data.timeStart;
     this._offers = data.offers;
     this._isFavorite = data.isFavorite;
     this._state.offers = data.offers;
