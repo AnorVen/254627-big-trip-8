@@ -31,7 +31,6 @@ const provider = new Provider({api, store, generateId: () => String(Date.now())}
 let destinations = [];
 let offers = [];
 let initialTasks = [];
-let newPointOpen = false;
 let apiDest = provider
   .getDestinations()
   .then((data) => {
@@ -62,6 +61,7 @@ function escKeyHandler(evt) {
   if (evt.keyCode === ESC_KEY_KODE) {
     tasksRender(initialTasks);
   }
+  NewPiontElement.addEventListener(`click`, renderNewPoint);
 }
 
 
@@ -87,60 +87,57 @@ TripPointsListElement.innerHTML = `Loading route...`;
 NewPiontElement.addEventListener(`click`, renderNewPoint);
 
 function renderNewPoint() {
-  if (!newPointOpen) {
-    newPointOpen = true;
-    window.addEventListener(`keydown`, escKeyHandler);
-    let newPointEdit = new TripPointEdit(
-        _.assignIn(
-            ModelPoint.parseTask(DB.NEW_POINT),
-            {id: initialTasks.length},
-            {destinations},
-            {newOffers: offers})
-    );
-    TripPointsListElement.insertBefore(newPointEdit.render(), TripPointsListElement.children[0]);
-    let point = ModelPoint.parseTask(DB.NEW_POINT);
-    newPointEdit.onSubmit = (newObject) => {
-      if (
-        newObject.title === DB.NEW_POINT.destination.name ||
-        newObject.price === 0 ||
-        newObject.timeStart === newObject.timeEnd
-      ) {
-        newPointEdit.handleApiError();
-        return;
-      }
+  NewPiontElement.removeEventListener(`click`, renderNewPoint);
+  window.addEventListener(`keydown`, escKeyHandler);
+  let newPointEdit = new TripPointEdit(
+      _.assignIn(
+          ModelPoint.parseTask(DB.NEW_POINT),
+          {id: initialTasks.length},
+          {destinations},
+          {newOffers: offers})
+  );
+  TripPointsListElement.insertBefore(newPointEdit.render(), TripPointsListElement.children[0]);
+  let point = ModelPoint.parseTask(DB.NEW_POINT);
+  newPointEdit.onSubmit = (newObject) => {
+    if (
+      newObject.title === DB.NEW_POINT.destination.name ||
+      newObject.price === 0 ||
+      newObject.timeStart === newObject.timeEnd
+    ) {
+      newPointEdit.handleApiError();
+      return;
+    }
 
-      point.id = newObject.id;
-      point.destination.name = newObject.title;
-      point.title = newObject.title;
-      point.icon = newObject.icon;
-      point.offers = [...newObject.offers.values()];
-      point.timeStart = newObject.timeStart;
-      point.timeEnd = newObject.timeEnd;
-      point.price = newObject.price;
-      point.isFavorite = newObject.isFavorite;
-      window.removeEventListener(`keydown`, escKeyHandler);
-      provider
-        .createTask({point: point.toRAW()})
-        .catch(() => newPointEdit.handleApiError())
-        .then(() => provider.getTasks())
-        .then((points) =>{
-          initialTasks = points;
-          tasksRender(points);
-        })
-        .catch((err) => {
-          TripPointsListElement.innerHTML = `Something went wrong while loading your route info. Check your connection or try again later. fetch error: ${err}`;
-          throw err;
-        });
-      newPointOpen = false;
-    };
+    point.id = newObject.id;
+    point.destination.name = newObject.title;
+    point.title = newObject.title;
+    point.icon = newObject.icon;
+    point.offers = [...newObject.offers.values()];
+    point.timeStart = newObject.timeStart;
+    point.timeEnd = newObject.timeEnd;
+    point.price = newObject.price;
+    point.isFavorite = newObject.isFavorite;
+    window.removeEventListener(`keydown`, escKeyHandler);
+    provider
+      .createTask({point: point.toRAW()})
+      .catch(() => newPointEdit.handleApiError())
+      .then(() => provider.getTasks())
+      .then((points) => {
+        initialTasks = points;
+        tasksRender(points);
+      })
+      .catch((err) => {
+        TripPointsListElement.innerHTML = `Something went wrong while loading your route info. Check your connection or try again later. fetch error: ${err}`;
+        throw err;
+      });
+  };
 
-    newPointEdit.onDelete = () => {
-      TripPointsListElement.removeChild(newPointEdit.element);
-      newPointEdit.unrender();
-      newPointOpen = false;
-      window.removeEventListener(`keydown`, escKeyHandler);
-    };
-  }
+  newPointEdit.onDelete = () => {
+    TripPointsListElement.removeChild(newPointEdit.element);
+    newPointEdit.unrender();
+    NewPiontElement.addEventListener(`click`, renderNewPoint);
+    window.removeEventListener(`keydown`, escKeyHandler);
+  };
 }
 
 
@@ -151,6 +148,7 @@ function statisticClickHandler(event) {
   document.querySelector(`.statistic`).classList.remove(`visually-hidden`);
   document.querySelector(`.trip-points`).classList.add(`visually-hidden`);
   document.querySelector(`.trip-filter`).classList.add(`visually-hidden`);
+  MainSortElement.classList.add(`visually-hidden`);
   renderChartContainer(initialTasks);
 }
 
@@ -161,6 +159,7 @@ function tableClickHandler(event) {
   document.querySelector(`.trip-filter`).classList.remove(`visually-hidden`);
   document.querySelector(`.trip-points`).classList.remove(`visually-hidden`);
   document.querySelector(`.statistic`).classList.add(`visually-hidden`);
+  MainSortElement.classList.remove(`visually-hidden`);
 }
 
 function filtersRender(arr) {
@@ -222,8 +221,7 @@ function sortTasks(points, target) {
       return points.sort((a, b) => (a.id > b.id ? 1 : -1));
     case `sorting-time`:
       return points.sort((a, b) =>
-        moment(a.timeStart) - moment(a.timeEnd) > moment(b.timeStart) - moment(b.timeEnd) ? 1 : -1
-      );
+        moment(a.timeStart) - moment(a.timeEnd) > moment(b.timeStart) - moment(b.timeEnd) ? 1 : -1);
     case `sorting-price`:
       return points.sort((a, b) => calculateFullPrice(a) < calculateFullPrice(b) ? 1 : -1);
     default:
@@ -293,7 +291,7 @@ function tasksRender(points) {
         provider.deleteTask(point)
           .catch(() => tripPointEdit.handleApiError())
           .then(() => provider.getTasks())
-          .then((newPoints) =>{
+          .then((newPoints) => {
             initialTasks = newPoints;
             tasksRender(newPoints);
           })

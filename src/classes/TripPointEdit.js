@@ -44,6 +44,8 @@ class TripPointEdit extends Component {
       .addEventListener(`change`, this._onTitleChange.bind(this));
     this._element.querySelector(`.point__offers-wrap`)
       .addEventListener(`change`, this._onChangeOffers.bind(this));
+    this._element.querySelector(`.point__price .point__input`)
+      .addEventListener(`change`, this._onPriceHandler.bind(this));
     this._element.querySelector(`#destination`)
       .addEventListener(`change`, this._destinationChangeHandler.bind(this));
     this.flatpickrTimeStart = flatpickr(this._element.querySelector(`.point__time .date__start`),
@@ -56,6 +58,7 @@ class TripPointEdit extends Component {
           dateFormat: `Y-m-d H:i`,
           onClose: (dateObj) => {
             this._timeStart = Date.parse(dateObj);
+            this.flatpickrTimeStart.destroy();
             this._reRender();
           },
         });
@@ -70,6 +73,7 @@ class TripPointEdit extends Component {
           dateFormat: `Y-m-d H:i`,
           onClose: (dateObj) => {
             this._timeEnd = Date.parse(dateObj);
+            this.flatpickrTimeEnd.destroy();
             this._reRender();
           },
         });
@@ -88,8 +92,16 @@ class TripPointEdit extends Component {
       .removeEventListener(`change`, this._onChangeOffers.bind(this));
     this._element.querySelector(`#destination`)
       .removeEventListener(`change`, this._destinationChangeHandler.bind(this));
-    this.flatpickrTimeStart.destroy();
-    this.flatpickrTimeEnd.destroy();
+    this._element.querySelector(`.point__price .point__input`)
+      .removeEventListener(`change`, this._onPriceHandler.bind(this));
+  }
+
+
+  _onPriceHandler(evt) {
+    evt.preventDefault();
+    let tempPrice = evt.target.value.replace(`/[^0-9,]/g`, ``);
+    this._price = tempPrice >= 0 ? tempPrice : 0;
+    this._reRender();
   }
 
   _onResetButtonClick(evt) {
@@ -354,8 +366,16 @@ class TripPointEdit extends Component {
 
              <label class="point__time">
                     choose time
-                    <input class="point__input date__start" type="text"  value="${moment(this._timeStart).format(`YYYY-MM-DD HH:mm`)}" name="timeStart" placeholder="${moment(this._timeStart).format(`HH:mm`)}">
-                    <input class="point__input date__end" type="text"  value="${moment(this._timeEnd).format(`YYYY-MM-DD HH:mm`)}" name="timeEnd" placeholder="${moment(this._timeEnd).format(`HH:mm`)}">
+                      <input class="point__input date__start"
+                        type="text"
+                        value="${moment(this._timeStart).format(`YYYY-MM-DD HH:mm`)}"              
+                        name="timeStart"
+                        placeholder="${moment(this._timeStart).format(`HH:mm`)}">
+                      <input class="point__input date__end"
+                        type="text"
+                        value="${moment(this._timeEnd).format(`YYYY-MM-DD HH:mm`)}"
+                        name="timeEnd"
+                        placeholder="${moment(this._timeEnd).format(`HH:mm`)}">
                   </label>
 
               <label class="point__price">
