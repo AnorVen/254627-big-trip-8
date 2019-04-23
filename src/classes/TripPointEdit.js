@@ -114,7 +114,6 @@ class TripPointEdit extends Component {
       this.unbind();
       this._onDelete();
     }
-
     buttonReset.innerHTML = `Delete`;
     buttonReset.disabled = false;
     buttonSave.disabled = false;
